@@ -18,6 +18,7 @@ class ProfileService
             'user' => $user,
             'followers_count' => $user->followers()->count(),
             'following_count' => $user->following()->count(),
+            'posts_count' => $user->posts()->count(),
         ];
     }
 
@@ -29,6 +30,7 @@ class ProfileService
             'following_count' => $target->following()->count(),
             'is_following' => $viewer->following()->where('following_id', $target->id)->exists(),
             'is_self' => $viewer->id === $target->id,
+            'posts_count' => $target->posts()->count(),
         ];
     }
 }

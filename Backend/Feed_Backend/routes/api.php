@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\FollowController;
+use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\LikeController;
+use App\Http\Controllers\Api\CommentController;
 
 
 Route::get('/user', function (Request $request) {
@@ -23,4 +26,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/users/{username}/follow', [FollowController::class, 'follow']);
     Route::delete('/users/{username}/follow', [FollowController::class, 'unfollow']);
+    
+    Route::get('/posts', [PostController::class, 'index']);
+    Route::post('/posts', [PostController::class, 'store']);
+    Route::get('/posts/{post}', [PostController::class, 'show']);
+    Route::delete('/posts/{post}', [PostController::class, 'destroy']);
+
+    Route::post('/posts/{post}/like', [LikeController::class, 'store']);
+    Route::delete('/posts/{post}/like', [LikeController::class, 'destroy']);
+
+    Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
 });
