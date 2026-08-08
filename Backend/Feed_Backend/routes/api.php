@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\SearchController;
 
 
 Route::get('/user', function (Request $request) {
@@ -37,4 +38,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
     Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
+
+    Route::get('/search', [SearchController::class, 'index']);
 });
