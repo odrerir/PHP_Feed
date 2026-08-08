@@ -15,5 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // global middlewares, groups and aliases are registered here
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // exception handling
+        $exceptions->shouldRenderJsonWhen(function ($request, Throwable $e) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
     })->create();
