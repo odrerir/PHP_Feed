@@ -19,10 +19,9 @@ class SearchController extends Controller
         security: [['sanctum' => []]],
         parameters: [
             new OA\Parameter(name: 'q', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
         ],
-        responses: [
-            new OA\Response(response: 200, description: 'Lista paginada de usuários'),
-        ]
+        responses: [new OA\Response(response: 200, description: 'Lista paginada de usuários')]
     )]
     public function index(Request $request): JsonResponse
     {
