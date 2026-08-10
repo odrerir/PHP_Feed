@@ -1,0 +1,1 @@
+<template><h1>Perfil de outro usuário (em construção)</h1></template>
