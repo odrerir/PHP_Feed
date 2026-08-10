@@ -1,11 +1,12 @@
 
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+export const STORAGE_URL = API_URL.replace('/api', '/storage')
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
-  headers: {
-    Accept: 'application/json',
-  },
+  baseURL: API_URL,
+  headers: { Accept: 'application/json' },
 })
 
 api.interceptors.request.use((config) => {
