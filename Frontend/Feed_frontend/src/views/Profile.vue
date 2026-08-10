@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { fetchOwnProfile, updateProfile } from '@/api/profile'
 import { STORAGE_URL } from '@/api/axios'
+import PostGrid from '@/components/PostGrid.vue'
+import { fetchUserPosts } from '@/api/posts'
+import DefaultAvatar from '@/assets/profile/Avatar.svg'
 
 const profile = ref(null)
 const loading = ref(true)
@@ -10,6 +13,9 @@ const saving = ref(false)
 const errors = ref({})
 const form = ref({ name: '', username: '', bio: '' })
 const avatarFile = ref(null)
+const posts = ref([])
+const postsPage = ref(1)
+const postsLastPage = ref(1)
 
 async function load() {
   loading.value = true
@@ -21,10 +27,18 @@ async function load() {
     bio: data.user.bio || '',
   }
   loading.value = false
+  await loadPosts(1)
+}
+
+async function loadPosts(page = 1) {
+  const { data } = await fetchUserPosts(profile.value.user.username, page)
+  posts.value = page === 1 ? data.data : [...posts.value, ...data.data]
+  postsPage.value = data.current_page
+  postsLastPage.value = data.last_page
 }
 
 function avatarUrl(path) {
-  return path ? `${STORAGE_URL}/${path}` : null
+  return path ? `${STORAGE_URL}/${path}` : DefaultAvatar
 }
 
 function handleFileChange(event) {
@@ -64,12 +78,7 @@ onMounted(load)
   <div v-if="loading">Carregando...</div>
 
   <div v-else-if="profile">
-    <img
-      v-if="avatarUrl(profile.user.avatar_path)"
-      :src="avatarUrl(profile.user.avatar_path)"
-      class="avatar"
-    />
-    <div v-else class="avatar avatar-placeholder" />
+    <img :src="avatarUrl(profile.user.avatar_path)" class="avatar" />
 
     <h1>{{ profile.user.name }}</h1>
     <p class="username">@{{ profile.user.username }}</p>
@@ -112,6 +121,8 @@ onMounted(load)
         <button type="button" @click="editing = false">Cancelar</button>
       </div>
     </form>
+    <PostGrid :posts="posts" />
+    <button v-if="postsPage < postsLastPage" @click="loadPosts(postsPage + 1)">Carregar mais posts</button>
   </div>
 </template>
 
@@ -120,7 +131,7 @@ onMounted(load)
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  border: 3px solid #000000;
+  border: 1px solid #000000;
   object-fit: cover;
 }
 .avatar-placeholder {

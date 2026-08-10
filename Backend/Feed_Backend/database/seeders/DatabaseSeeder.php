@@ -10,7 +10,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $users = User::factory(15)->create();
-
+        $users->each(function (User $user) {
+            $user->profile()->create([
+                'avatar' => fake()->sentence(),
+            ]);
+        });
         $users->each(function (User $user) use ($users) {
             Post::factory(rand(1, 5))->create(['user_id' => $user->id])
                 ->each(function (Post $post) use ($users) {

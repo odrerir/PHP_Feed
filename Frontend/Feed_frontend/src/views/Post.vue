@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { fetchPost, deletePost, fetchComments, createComment, likePost, unlikePost } from '@/api/posts'
 import { STORAGE_URL } from '@/api/axios'
 import { useAuthStore } from '@/stores/auth'
+import DefaultAvatar from '@/assets/profile/Avatar.svg'
 
 const props = defineProps(['id'])
 const router = useRouter()
@@ -18,6 +19,10 @@ const deleting = ref(false)
 
 function mediaUrl(path) {
   return path ? `${STORAGE_URL}/${path}` : null
+}
+
+function avatarUrl(path) {
+  return path ? `${STORAGE_URL}/${path}` : DefaultAvatar
 }
 
 async function load() {
@@ -80,8 +85,9 @@ watch(() => props.id, load)
 
   <div v-else-if="post">
     <header class="post-header">
-      <router-link :to="{ name: 'user-profile', params: { username: post.user.username } }">
-        @{{ post.user.username }}
+      <router-link :to="{ name: 'user-profile', params: { username: post.user.username } }" class="post-user">
+        <img :src="avatarUrl(post.user.avatar_path)" class="post-avatar" />
+        <span>@{{ post.user.username }}</span>
       </router-link>
       <button v-if="post.user.id === auth.user?.id" @click="handleDelete" :disabled="deleting" class="delete-btn">
         Excluir
@@ -107,6 +113,7 @@ watch(() => props.id, load)
 
       <p v-if="comments.length === 0">Nenhum comentário ainda.</p>
       <div v-for="comment in comments" :key="comment.id" class="comment">
+        <img :src="avatarUrl(comment.user.avatar_path)" class="comment-avatar" />
         <strong>@{{ comment.user.username }}</strong> {{ comment.content }}
       </div>
     </section>
@@ -123,7 +130,44 @@ watch(() => props.id, load)
 .liked { color: #e0245e; }
 .caption { margin-bottom: 1rem; }
 .comments { border-top: 1px solid #dbdbdb; padding-top: 1rem; }
-.comment-form { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-.comment-form input { flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
-.comment { padding: 0.4rem 0; font-size: 0.9rem; }
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.post-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+.post-avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-form input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.comment {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  font-size: 0.9rem;
+}
+
+.comment-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 </style>

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { searchUsers } from '@/api/search'
 import { STORAGE_URL } from '@/api/axios'
 import { useAuthStore } from '@/stores/auth'
+import DefaultAvatar from '@/assets/profile/Avatar.svg'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -15,7 +16,7 @@ const loading = ref(false)
 let debounceTimer = null
 
 function avatarUrl(path) {
-  return path ? `${STORAGE_URL}/${path}` : null
+  return path ? `${STORAGE_URL}/${path}` : DefaultAvatar
 }
 
 async function runSearch() {
@@ -74,8 +75,7 @@ async function handleLogout() {
             class="dropdown-item"
             @mousedown.prevent="selectUser(user.username)"
           >
-            <img v-if="avatarUrl(user.avatar_path)" :src="avatarUrl(user.avatar_path)" class="avatar" />
-            <div v-else class="avatar avatar-placeholder" />
+            <img :src="avatarUrl(user.avatar_path)" class="avatar" />
             <div class="dropdown-user-info">
               <strong>@{{ user.username }}</strong>
               <p>{{ user.name }}</p>

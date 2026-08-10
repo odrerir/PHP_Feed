@@ -53,4 +53,14 @@ class PostService
             'is_liked'       => $post->isLikedBy($viewer),
         ];
     }
+
+    public function byUser(User $user, User $viewer, int $perPage = 12)
+    {
+        return Post::where('user_id', $user->id)
+            ->with('user')
+            ->withCount(['comments', 'likes'])
+            ->latest()
+            ->paginate($perPage)
+            ->through(fn (Post $post) => $this->formatPost($post, $viewer));
+    }
 }

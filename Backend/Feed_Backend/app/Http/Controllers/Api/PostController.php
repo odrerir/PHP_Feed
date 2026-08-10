@@ -9,6 +9,7 @@ use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
+use App\Models\User;
 
 class PostController extends Controller
 {
@@ -93,5 +94,12 @@ class PostController extends Controller
     {
         $this->postService->delete($post, $request->user());
         return response()->json(['message' => 'Post excluído com sucesso.']);
+    }
+
+    public function byUser(Request $request, string $username): JsonResponse
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        return response()->json($this->postService->byUser($user, $request->user()));
     }
 }

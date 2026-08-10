@@ -31,3 +31,7 @@ export function fetchComments(id) {
 export function createComment(id, content) {
   return api.post(`/posts/${id}/comments`, { content })
 }
+
+export function fetchUserPosts(username, page = 1) {
+  return api.get(`/users/${username}/posts`, { params: { page } })
+}

@@ -1,11 +1,16 @@
 <script setup>
 import { STORAGE_URL } from '@/api/axios'
 import { likePost, unlikePost } from '@/api/posts'
+import DefaultAvatar from '@/assets/profile/Avatar.svg'
 
 const props = defineProps({ post: Object })
 
 function mediaUrl(path) {
   return path ? `${STORAGE_URL}/${path}` : null
+}
+
+function avatarUrl(path) {
+  return path ? `${STORAGE_URL}/${path}` : DefaultAvatar
 }
 
 async function toggleLike() {
@@ -29,8 +34,9 @@ async function toggleLike() {
 <template>
   <article class="post-card">
     <header>
-      <router-link :to="{ name: 'user-profile', params: { username: post.user.username } }">
-        @{{ post.user.username }}
+      <router-link :to="{ name: 'user-profile', params: { username: post.user.username } }" class="post-user">
+        <img :src="avatarUrl(post.user.avatar_path)" class="post-avatar" />
+        <span>@{{ post.user.username }}</span>
       </router-link>
     </header>
 
@@ -46,19 +52,84 @@ async function toggleLike() {
     </div>
 
     <p v-if="post.caption" class="caption">
+      <img :src="avatarUrl(post.user.avatar_path)" class="caption-avatar" />
       <strong>@{{ post.user.username }}</strong> {{ post.caption }}
     </p>
   </article>
 </template>
 
 <style scoped>
-.post-card { border: 1px solid #dbdbdb; border-radius: 8px; margin-bottom: 1.5rem; overflow: hidden; }
-header { padding: 0.75rem; font-weight: 600; }
-header a { color: inherit; text-decoration: none; }
-.media { width: 100%; display: block; aspect-ratio: 1 / 1; object-fit: cover; }
-.actions { display: flex; gap: 1rem; padding: 0.5rem 0.75rem; }
-.actions button { background: none; border: none; cursor: pointer; font-size: 1rem; }
-.actions a { color: inherit; text-decoration: none; }
-.liked { color: #e0245e; }
-.caption { padding: 0 0.75rem 0.75rem; }
+.post-card {
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+header {
+  padding: 0.75rem;
+  font-weight: 600;
+}
+
+header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.media {
+  width: 100%;
+  display: block;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.actions a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.post-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.post-avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.caption-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.liked {
+  color: #e0245e;
+}
+
+.caption {
+  padding: 0 0.75rem 0.75rem;
+}
 </style>
