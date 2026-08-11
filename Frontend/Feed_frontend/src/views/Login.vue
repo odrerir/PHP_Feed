@@ -31,73 +31,131 @@ async function handleSubmit() {
 
 <template>
   <div class="auth-page">
-    <form @submit.prevent="handleSubmit">
-      <h1>Entrar</h1>
+    <h1 class="logo">Muse</h1>
+    <p class="tagline">Fotos com calma. Bem-vinda de volta.</p>
 
-      <div v-if="errors.general" class="error">{{ errors.general[0] }}</div>
+    <div class="auth-card">
+      <form @submit.prevent="handleSubmit">
+        <div v-if="errors.general" class="error general-error">{{ errors.general[0] }}</div>
 
-      <label>
-        Email
-        <input v-model="form.email" type="email" required />
-        <span v-if="errors.email" class="error">{{ errors.email[0] }}</span>
-      </label>
+        <label>
+          E-mail
+          <input v-model="form.email" type="email" placeholder="voce@email.com" required />
+          <span v-if="errors.email" class="error">{{ errors.email[0] }}</span>
+        </label>
 
-      <label>
-        Senha
-        <input v-model="form.password" type="password" required />
-        <span v-if="errors.password" class="error">{{ errors.password[0] }}</span>
-      </label>
+        <label>
+          Senha
+          <input v-model="form.password" type="password" placeholder="••••••••" required />
+          <span v-if="errors.password" class="error">{{ errors.password[0] }}</span>
+        </label>
 
-      <button type="submit" :disabled="loading">
-        {{ loading ? 'Entrando...' : 'Entrar' }}
-      </button>
+        <button type="submit" :disabled="loading">
+          {{ loading ? 'Entrando...' : 'Entrar' }}
+        </button>
+      </form>
+    </div>
 
-      <p>
-        Não tem conta?
-        <router-link :to="{ name: 'register' }">Registrar</router-link>
-      </p>
-    </form>
+    <p class="switch-auth">
+      Ainda não tem conta?
+      <router-link :to="{ name: 'register' }">Criar conta</router-link>
+    </p>
   </div>
 </template>
 
 <style scoped>
 .auth-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-}
-form {
-  width: 320px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+.logo {
+  font-family: 'Georgia', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 0.25rem;
+}
+.tagline {
+  color: var(--color-text-muted);
+  margin: 0 0 2rem;
+  font-size: 0.95rem;
+}
+.auth-card {
+  width: 380px;
+  max-width: 90vw;
+  padding: 2rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
 }
 label {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.4rem;
   font-size: 0.9rem;
+  font-weight: 500;
 }
 input {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--color-text);
+}
+input::placeholder {
+  color: var(--color-text-muted);
+}
+input:focus {
+  outline: none;
+  border-color: var(--color-primary);
 }
 button {
-  padding: 0.6rem;
+  margin-top: 0.5rem;
+  padding: 0.85rem;
   border: none;
-  border-radius: 4px;
-  background: #0095f6;
+  border-radius: 8px;
+  background: var(--color-primary);
   color: white;
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.95rem;
   cursor: pointer;
+  transition: background 0.15s;
+}
+button:hover:not(:disabled) {
+  background: var(--color-primary-hover);
 }
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
+.switch-auth {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+.switch-auth a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
 .error {
-  color: #e0245e;
+  color: var(--color-error);
   font-size: 0.8rem;
+}
+.general-error {
+  text-align: center;
 }
 </style>

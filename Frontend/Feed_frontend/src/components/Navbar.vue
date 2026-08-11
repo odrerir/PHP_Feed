@@ -2,9 +2,8 @@
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { searchUsers } from '@/api/search'
-import { STORAGE_URL } from '@/api/axios'
 import { useAuthStore } from '@/stores/auth'
-import DefaultAvatar from '@/assets/profile/Avatar.svg'
+import Avatar from '@/components/Avatar.vue'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -14,10 +13,6 @@ const results = ref([])
 const showDropdown = ref(false)
 const loading = ref(false)
 let debounceTimer = null
-
-function avatarUrl(path) {
-  return path ? `${STORAGE_URL}/${path}` : DefaultAvatar
-}
 
 async function runSearch() {
   if (!query.value.trim()) {
@@ -35,9 +30,13 @@ watch(query, () => {
   debounceTimer = setTimeout(runSearch, 400)
 })
 
-function selectUser(username) {
+function clearSearch() {
   query.value = ''
   results.value = []
+}
+
+function selectUser(username) {
+  clearSearch()
   showDropdown.value = false
   router.push({ name: 'user-profile', params: { username } })
 }
@@ -50,195 +49,190 @@ async function handleLogout() {
 
 <template>
   <nav class="navbar">
-    <div class="nav-block">
-      <router-link :to="{ name: 'home' }" class="nav-link">Home</router-link>
-      <router-link :to="{ name: 'profile' }" class="nav-link">Profile</router-link>
-    </div>
-    <div class="nav-block" id="search-bar">
-      <div class="search-wrapper">
+    <router-link :to="{ name: 'home' }" class="logo">Muse</router-link>
+
+    <div class="search-wrapper">
+      <div class="search-input-box">
+        <svg class="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input
           v-model="query"
           type="text"
-          placeholder="Pesquisar..."
-          class="search-input"
+          placeholder="Buscar pessoas no Muse"
           @focus="showDropdown = true"
           @blur="showDropdown = false"
         />
+        <button v-if="query" class="clear-btn" @mousedown.prevent="clearSearch">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
 
-        <div v-if="showDropdown && query.trim()" class="search-dropdown">
-          <div v-if="loading" class="dropdown-msg">Buscando...</div>
-          <div v-else-if="results.length === 0" class="dropdown-msg">Nenhum usuário encontrado.</div>
+      <div v-if="showDropdown && query.trim()" class="search-dropdown">
+        <div v-if="loading" class="dropdown-msg">Buscando...</div>
+        <div v-else-if="results.length === 0" class="dropdown-msg">Nenhum usuário encontrado.</div>
 
-          <button
-            v-for="user in results"
-            :key="user.id"
-            class="dropdown-item"
-            @mousedown.prevent="selectUser(user.username)"
-          >
-            <img :src="avatarUrl(user.avatar_path)" class="avatar" />
-            <div class="dropdown-user-info">
-              <strong>@{{ user.username }}</strong>
-              <p>{{ user.name }}</p>
-            </div>
-          </button>
-        </div>
+        <button
+          v-for="user in results"
+          :key="user.id"
+          class="dropdown-item"
+          @mousedown.prevent="selectUser(user.username)"
+        >
+          <Avatar :name="user.name" :avatar-path="user.avatar_path" :size="36" />
+          <div class="dropdown-user-info">
+            <strong>{{ user.name }}</strong>
+            <p>@{{ user.username }}</p>
+          </div>
+        </button>
       </div>
     </div>
 
-    <div class="nav-block">
-      <button @click="handleLogout" class="nav-link logout-btn">Sair</button>
+    <div class="nav-right">
+      <router-link :to="{ name: 'profile' }">
+        <Avatar :name="auth.user?.name || ''" :avatar-path="auth.user?.avatar_path" :size="38" />
+      </router-link>
+      <button class="logout-btn" @click="handleLogout" title="Sair">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
     </div>
   </nav>
 </template>
-
 
 <style scoped>
 .navbar {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  grid-template-areas: "links search logout";
   align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #dbdbdb;
-  gap: 0.75rem;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
 }
-.nav-block:first-child {
-  grid-area: links;
-  justify-self: start;
-}
-#search-bar {
-  grid-area: search;
-  justify-self: center;
-}
-.nav-block:last-child {
-  grid-area: logout;
-  justify-self: end;
-}
-.nav-block {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-.nav-link {
-  text-decoration: none;
-  color: #262626;
-  font-weight: 500;
-  white-space: nowrap;
-}
-.router-link-exact-active {
+.logo {
+  font-family: 'Georgia', serif;
+  font-size: 1.6rem;
   font-weight: 700;
-  color: #0095f6;
+  color: var(--color-primary);
+  text-decoration: none;
+  justify-self: start;
 }
 .search-wrapper {
   position: relative;
-  width: 40rem;
+  justify-self: center;
+  width: 32rem;
   max-width: 70vw;
-  padding: 0.2rem 0.4rem;
 }
-.search-input {
-  width: 100%;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #dbdbdb;
-  border-radius: 6px;
-  box-sizing: border-box;
+.search-input-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-background);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+}
+.search-input-box:focus-within {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-primary) 16%, transparent);
+}
+.icon-search {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+.search-input-box input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+.search-input-box input::placeholder {
+  color: var(--color-text-muted);
+}
+.clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  display: flex;
+}
+.clear-btn svg {
+  width: 16px;
+  height: 16px;
 }
 .search-dropdown {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 0.6rem);
   left: 0;
   width: 100%;
-  min-width: 280px;
-  background: white;
-  border: 1px solid #dbdbdb;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
   max-height: 320px;
   overflow-y: auto;
-  z-index: 10;
+  z-index: 20;
+  padding: 0.4rem;
 }
 .dropdown-msg {
   padding: 0.75rem;
-  color: #8e8e8e;
-  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
 }
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.7rem;
   width: 100%;
-  padding: 0.5rem 0.75rem;
+  padding: 0.55rem 0.6rem;
   background: none;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
   text-align: left;
+  font-family: inherit;
 }
 .dropdown-item:hover {
-  background: #fafafa;
+  background: var(--color-background);
 }
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-.avatar-placeholder {
-  background: #dbdbdb;
+.dropdown-user-info strong {
+  display: block;
+  font-size: 0.88rem;
 }
 .dropdown-user-info p {
-  font-size: 0.8rem;
-  color: #8e8e8e;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
   margin: 0;
 }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  justify-self: end;
+}
 .logout-btn {
-  margin-left: auto;
   background: none;
   border: none;
   cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
+  color: var(--color-text-muted);
+  display: flex;
 }
-
-/* Tablet: busca ainda cabe na mesma linha, só encolhe um pouco */
-@media (max-width: 900px) {
-  .search-wrapper {
-    width: 100%;
-    max-width: 50vw;
-  }
+.logout-btn svg {
+  width: 20px;
+  height: 20px;
 }
-
-/* Mobile: empilha em 2 linhas — links+logout em cima, busca ocupando a largura toda embaixo */
 @media (max-width: 640px) {
   .navbar {
     grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "links logout"
-      "search search";
+    grid-template-areas: "logo right" "search search";
+    padding: 0.85rem 1rem;
     row-gap: 0.6rem;
-    padding: 0.75rem;
   }
-  .nav-block {
-    gap: 1rem;
-  }
-  .search-wrapper {
-    width: 20rem;
-    max-width: 100%;
-    padding: 0;
-  }
-}
-
-/* Telas bem pequenas: aperta ainda mais o espaçamento e a fonte */
-@media (max-width: 380px) {
-  .nav-block {
-    gap: 0.6rem;
-  }
-  .nav-link {
-    font-size: 0.9rem;
-  }
-  .search-wrapper {
-    width: 100%;
-    max-width: 100%;
-    padding: 0;
-  }
+  .logo { grid-area: logo; }
+  .nav-right { grid-area: right; }
+  .search-wrapper { grid-area: search; width: 100%; max-width: 100%; }
 }
 </style>

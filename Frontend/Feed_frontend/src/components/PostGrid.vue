@@ -26,13 +26,13 @@ function mediaUrl(path) {
 .post-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  margin-top: 1.5rem;
+  gap: 6px;
 }
 .grid-item {
   aspect-ratio: 1 / 1;
   display: block;
   overflow: hidden;
+  border-radius: 6px;
 }
 .grid-item img {
   width: 100%;
@@ -40,6 +40,6 @@ function mediaUrl(path) {
   object-fit: cover;
 }
 .grid-item-placeholder {
-  background: #efefef;
+  background: var(--color-background);
 }
 </style>

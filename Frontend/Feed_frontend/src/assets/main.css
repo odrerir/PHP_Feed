@@ -1,0 +1,27 @@
+:root {
+  --color-primary: #a78bfa;
+  --color-primary-hover: #8b6cf0;
+  --color-accent: #f9a8d4;
+  --color-background: #fdf9f7;
+  --color-surface: #ffffff;
+  --color-border: #ede4e8;
+  --color-text: #4a4550;
+  --color-text-muted: #9c93a3;
+  --color-error: #f0729c;
+  --color-avatar-ring: #e4defa;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(167, 139, 250, 0.07);
+
+  --radius: 12px;
+  --font-sans: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
