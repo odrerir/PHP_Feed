@@ -53,7 +53,7 @@ async function handleLogout() {
 
     <div class="search-wrapper">
       <div class="search-input-box">
-        <svg class="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <i class="bi bi-search icon-search"></i>
         <input
           v-model="query"
           type="text"
@@ -62,7 +62,7 @@ async function handleLogout() {
           @blur="showDropdown = false"
         />
         <button v-if="query" class="clear-btn" @mousedown.prevent="clearSearch">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <i class="bi bi-x-lg"></i> 
         </button>
       </div>
 
@@ -90,7 +90,7 @@ async function handleLogout() {
         <Avatar :name="auth.user?.name || ''" :avatar-path="auth.user?.avatar_path" :size="60" />
       </router-link>
       <button class="logout-btn" @click="handleLogout" title="Sair">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <i class="bi bi-box-arrow-right"></i>
       </button>
     </div>
   </nav>
@@ -140,6 +140,7 @@ async function handleLogout() {
   color: var(--color-text-muted);
   flex-shrink: 0;
 }
+
 .search-input-box input {
   flex: 1;
   border: none;
@@ -159,7 +160,7 @@ async function handleLogout() {
   color: var(--color-text-muted);
   display: flex;
 }
-.clear-btn svg {
+.clear-btn {
   width: 16px;
   height: 16px;
 }
@@ -227,9 +228,8 @@ async function handleLogout() {
   border-radius: 8px;
   background-color: var(--color-border);
 }
-.logout-btn svg {
-  width: 20px;
-  height: 20px;
+.clear-btn i, .logout-btn i { 
+  font-size: 1.3rem; 
 }
 @media (max-width: 640px) {
   .navbar {

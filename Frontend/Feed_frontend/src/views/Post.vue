@@ -4,7 +4,8 @@ import { useRouter } from 'vue-router'
 import { fetchPost, deletePost, fetchComments, createComment, likePost, unlikePost } from '@/api/posts'
 import { STORAGE_URL } from '@/api/axios'
 import { useAuthStore } from '@/stores/auth'
-import DefaultAvatar from '@/assets/profile/Avatar.svg'
+import { timeAgo } from '@/lib/time'
+import Avatar from '@/components/Avatar.vue'
 
 const props = defineProps(['id'])
 const router = useRouter()
@@ -19,10 +20,6 @@ const deleting = ref(false)
 
 function mediaUrl(path) {
   return path ? `${STORAGE_URL}/${path}` : null
-}
-
-function avatarUrl(path) {
-  return path ? `${STORAGE_URL}/${path}` : DefaultAvatar
 }
 
 async function load() {
@@ -56,7 +53,7 @@ async function handleComment() {
 
   try {
     const { data } = await createComment(props.id, newComment.value)
-    comments.value.unshift(data)
+    comments.value.push(data)
     newComment.value = ''
     post.value.comments_count += 1
   } finally {
@@ -83,137 +80,228 @@ watch(() => props.id, load)
 <template>
   <div v-if="loading">Carregando...</div>
 
-  <div v-else-if="post">
-    <header class="post-header">
-      <router-link :to="{ name: 'user-profile', params: { username: post.user.username } }" class="post-user">
-        <img :src="avatarUrl(post.user.avatar_path)" class="post-avatar" />
-        <span>@{{ post.user.username }}</span>
-      </router-link>
-      <button v-if="post.user.id === auth.user?.id" @click="handleDelete" :disabled="deleting" class="delete-btn">
-        Excluir
-      </button>
-    </header>
-
-    <img v-if="mediaUrl(post.media_path)" :src="mediaUrl(post.media_path)" class="media" />
-
-    <div class="actions">
-      <button @click="toggleLike" :class="{ liked: post.is_liked }">
-        {{ post.is_liked ? '♥' : '♡' }} {{ post.likes_count }}
-      </button>
-      <span>💬 {{ post.comments_count }}</span>
+  <div v-else-if="post" class="post-detail">
+    <div class="media-side">
+      <img v-if="mediaUrl(post.media_path)" :src="mediaUrl(post.media_path)" />
     </div>
 
-    <p v-if="post.caption" class="caption">{{ post.caption }}</p>
+    <div class="panel">
+      <header class="panel-header">
+        <Avatar :name="post.user.name" :avatar-path="post.user.avatar_path" :size="40" />
+        <div class="author-info">
+          <router-link :to="{ name: 'user-profile', params: { username: post.user.username } }" class="author-name">
+            {{ post.user.name }}
+          </router-link>
+          <span>@{{ post.user.username }}</span>
+        </div>
+        <button v-if="post.user.id === auth.user?.id" class="delete-btn" @click="handleDelete" :disabled="deleting">
+          <i class="bi bi-trash"></i>
+        </button>
+      </header>
 
-    <section class="comments">
-      <form @submit.prevent="handleComment" class="comment-form">
-        <input v-model="newComment" type="text" placeholder="Adicione um comentário..." />
-        <button type="submit" :disabled="commenting">Enviar</button>
-      </form>
+      <div class="panel-body">
+        <div class="comment-row">
+          <Avatar :name="post.user.name" :avatar-path="post.user.avatar_path" :size="34" />
+          <div class="comment-content">
+            <p><strong>{{ post.user.username }}</strong> {{ post.caption }}</p>
+            <span class="comment-time">{{ timeAgo(post.created_at) }}</span>
+          </div>
+        </div>
 
-      <p v-if="comments.length === 0">Nenhum comentário ainda.</p>
-      <div v-for="comment in comments" :key="comment.id" class="comment">
-        <img :src="avatarUrl(comment.user.avatar_path)" class="comment-avatar" />
-        <strong>@{{ comment.user.username }}</strong> {{ comment.content }}
+        <div v-for="comment in comments" :key="comment.id" class="comment-row">
+          <Avatar :name="comment.user.name" :avatar-path="comment.user.avatar_path" :size="34" />
+          <div class="comment-content">
+            <p><strong>{{ comment.user.username }}</strong> {{ comment.content }}</p>
+            <span class="comment-time">{{ timeAgo(comment.created_at) }}</span>
+          </div>
+        </div>
       </div>
-    </section>
+
+      <div class="panel-actions">
+        <button class="icon-btn" :class="{ liked: post.is_liked }" @click="toggleLike">
+          <i :class="post.is_liked ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+          {{ post.likes_count }}
+        </button>
+        <span class="icon-btn">
+          <i class="bi bi-chat"></i>
+          {{ post.comments_count }}
+        </span>
+      </div>
+
+      <form class="panel-input" @submit.prevent="handleComment">
+        <Avatar :name="auth.user?.name || ''" :avatar-path="auth.user?.avatar_path" :size="32" />
+        <input v-model="newComment" type="text" placeholder="Escreva algo gentil..." />
+        <button type="submit" :disabled="commenting">
+          <i class="bi bi-send-fill"></i>
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.post-header {
+.post-detail {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  min-height: 500px;
+}
+.media-side {
+  background: var(--color-background);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 0;
-  font-weight: 600;
 }
-
-.post-header a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.delete-btn {
-  background: none;
-  border: 1px solid #e0245e;
-  color: #e0245e;
-  border-radius: 4px;
-  padding: 0.25rem 0.6rem;
-  cursor: pointer;
-}
-
-.media {
+.media-side img {
   width: 100%;
-  border-radius: 8px;
+  display: block;
 }
-
-.actions {
+.panel {
   display: flex;
-  gap: 1rem;
-  padding: 0.5rem 0;
+  flex-direction: column;
+  border-left: 1px solid var(--color-border);
+}
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.author-info { 
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
 }
 
-.actions button {
+.author-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  width: fit-content;
+  transition: color 0.15s;
+}
+
+.author-name:hover { 
+  color: var(--color-primary); 
+}
+
+.author-info span { 
+  font-size: 0.78rem; 
+  color: var(--color-text-muted); 
+}
+.delete-btn {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
 }
 
-.liked {
-  color: #e0245e;
+.delete-btn:hover { 
+  color: var(--color-error); 
 }
 
-.caption {
-  margin-bottom: 1rem;
-}
-
-.comments {
-  border-top: 1px solid #dbdbdb;
-  padding-top: 1rem;
-}
-
-.comment-form {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.post-user {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: inherit;
-  text-decoration: none;
-}
-
-.post-avatar {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.comment-form input {
+.panel-body {
   flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
 }
 
-.comment {
+.comment-row { 
+  display: flex; 
+  gap: 0.6rem; 
+}
+
+.comment-content p { 
+  margin: 0; 
+  font-size: 0.88rem; 
+  line-height: 1.4; 
+}
+
+.comment-content strong { 
+  margin-right: 0.3rem; 
+}
+
+.comment-time { 
+  font-size: 0.75rem; 
+  color: var(--color-text-muted); 
+}
+
+.panel-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0;
-  font-size: 0.9rem;
+  gap: 1.1rem;
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--color-border);
 }
 
-.comment-avatar {
-  width: 24px;
-  height: 24px;
+.icon-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.icon-btn i { 
+  font-size: 1.25rem; 
+  color: var(--color-text-muted); 
+}
+
+.icon-btn.liked i { 
+  color: var(--color-accent); 
+}
+
+.panel-input {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem;
+  border-top: 1px solid var(--color-border);
+}
+.panel-input input {
+  flex: 1;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  background: var(--color-background);
+}
+.panel-input input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+.panel-input button {
+  background: var(--color-primary);
+  color: white;
+  border: none;
   border-radius: 50%;
-  object-fit: cover;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.panel-input button:disabled { opacity: 0.6; cursor: not-allowed; }
+.panel-input button i { font-size: 0.95rem; }
+
+@media (max-width: 720px) {
+  .post-detail { grid-template-columns: 1fr; }
+  .panel { border-left: none; border-top: 1px solid var(--color-border); }
 }
 </style>

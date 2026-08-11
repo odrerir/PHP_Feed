@@ -15,6 +15,7 @@ const loading = ref(true)
 const loadingMore = ref(false)
 
 const suggestions = ref([])
+const loadingSuggestions = ref(false)
 
 const showForm = ref(false)
 const caption = ref('')
@@ -30,10 +31,17 @@ async function loadFeed(pageNumber = 1) {
 }
 
 async function loadSuggestions() {
-  // reaproveita o endpoint de busca sem termo nenhum, que já devolve
-  // todos os usuários exceto você mesmo — pega só os 4 primeiros
-  const { data } = await searchUsers('')
-  suggestions.value = data.data.slice(0, 4)
+  loadingSuggestions.value = true
+  try {
+    // reaproveita o endpoint de busca sem termo nenhum, que já devolve
+    // todos os usuários exceto você mesmo — pega só os 4 primeiros
+    const { data } = await searchUsers('')
+    suggestions.value = data.data.slice(0, 4)
+  } catch (err) {
+    suggestions.value = []
+  } finally {
+    loadingSuggestions.value = false
+  }
 }
 
 async function loadMore() {
@@ -69,8 +77,9 @@ async function handleCreatePost() {
 
 onMounted(async () => {
   loading.value = true
-  await Promise.all([loadFeed(1), loadSuggestions()])
+  await loadFeed(1)
   loading.value = false
+  loadSuggestions()
 })
 </script>
 
@@ -84,14 +93,15 @@ onMounted(async () => {
             Compartilhe com seus amigos {{ auth.user?.name?.split(' ')[0] || '' }}
           </button>
           <button class="new-post-btn" @click="showForm = true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <i class="bi bi-image"></i>
             Novo post
           </button>
         </template>
 
         <form v-else @submit.prevent="handleCreatePost" class="new-post-form">
           <textarea v-model="caption" placeholder="Legenda (opcional)" rows="2" />
-          <input type="file" accept="image/*" required @change="handleFileChange" />
+          <label for="media-upload" class="file-upload-btn">Escolher imagem</label>
+          <input id="media-upload" class="file-input-hidden" type="file" accept="image/*" required @change="handleFileChange" />
           <span v-if="errors.media" class="error">{{ errors.media[0] }}</span>
           <div class="form-actions">
             <button type="submit" :disabled="posting">{{ posting ? 'Publicando...' : 'Publicar' }}</button>
@@ -182,18 +192,57 @@ onMounted(async () => {
   font-size: 0.88rem;
   cursor: pointer;
 }
-.new-post-btn:hover { background: var(--color-primary-hover); }
-.new-post-btn svg { width: 18px; height: 18px; }
-.new-post-form { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; }
-.new-post-form textarea,
-.new-post-form input[type='file'] {
+.new-post-btn:hover { 
+  background: var(--color-primary-hover); 
+}
+
+.new-post-btn svg { 
+  width: 18px; 
+  height: 18px; 
+}
+
+.new-post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.new-post-form textarea {
   font-family: inherit;
   padding: 0.6rem;
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-background);
+  min-height: 120px;
+  max-height: 220px;
+  resize: none;
 }
-.form-actions { display: flex; gap: 0.6rem; }
+
+.file-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
 .form-actions button[type='submit'] {
   background: var(--color-primary);
   color: white;
@@ -204,6 +253,7 @@ onMounted(async () => {
   cursor: pointer;
   font-family: inherit;
 }
+
 .cancel-btn {
   background: none;
   border: 1px solid var(--color-border);

@@ -53,7 +53,7 @@ watch(() => props.username, () => {
 <template>
   <div v-if="loading">Carregando...</div>
 
-  <div v-else-if="profile" class="content">
+  <div v-else-if="profile" class="content-profile">
     <div class="profile-card">
       <Avatar :name="profile.user.name" :avatar-path="profile.user.avatar_path" :size="96" />
 
@@ -75,14 +75,13 @@ watch(() => props.username, () => {
         :class="{ following: profile.is_following }"
         @click="toggleFollow"
       >
-        <svg v-if="profile.is_following" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        <i :class="profile.is_following ? 'bi bi-check-lg' : 'bi bi-person-plus'"></i>
         {{ profile.is_following ? 'Seguindo' : 'Seguir' }}
       </button>
     </div>
 
     <div class="section-header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <i class="bi bi-grid-3x3-gap"></i>
       <h2>Publicações</h2>
     </div>
 
@@ -94,7 +93,7 @@ watch(() => props.username, () => {
 </template>
 
 <style scoped>
-.content {
+.content-profile {
   max-width: 48rem;
   margin: 0 auto;
 }
@@ -138,7 +137,7 @@ watch(() => props.username, () => {
   color: white;
 }
 
-.follow-btn svg {
+.follow-btn  {
   width: 16px;
   height: 16px;
 }
@@ -157,7 +156,7 @@ watch(() => props.username, () => {
   color: var(--color-text-muted);
 }
 
-.section-header svg {
+.section-header  {
   width: 18px;
   height: 18px;
 }

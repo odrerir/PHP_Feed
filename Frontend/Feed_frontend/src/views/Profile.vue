@@ -91,9 +91,9 @@ onMounted(load)
 <template>
   <div v-if="loading">Carregando...</div>
 
-  <div v-else-if="profile" class="content">
+  <div v-else-if="profile" class="content-profile">
     <div class="profile-card">
-      <Avatar :name="profile.user.name" :avatar-path="profile.user.avatar_path" :size="96" />
+      <Avatar :name="profile.user.name" :avatar-path="profile.user.avatar_path" :size="150" />
 
       <div class="profile-info">
         <h1>{{ profile.user.name }}</h1>
@@ -108,13 +108,13 @@ onMounted(load)
       </div>
 
       <button class="edit-btn" @click="openEdit">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+        <i class="bi bi-pencil"></i>
         Editar perfil
       </button>
     </div>
 
     <div class="section-header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <i class="bi bi-grid-3x3-gap"></i>
       <h2>Publicações</h2>
     </div>
 
@@ -129,7 +129,7 @@ onMounted(load)
         <div class="modal-header">
           <h2>Editar perfil</h2>
           <button class="close-btn" @click="closeEdit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <i class="bi bi-x-lg"></i>
           </button>
         </div>
 
@@ -139,7 +139,7 @@ onMounted(load)
               <img v-if="avatarPreview" :src="avatarPreview" class="avatar-preview" />
               <Avatar v-else :name="profile.user.name" :avatar-path="profile.user.avatar_path" :size="72" />
               <button type="button" class="camera-btn" @click="triggerFileSelect">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <i class="bi bi-camera-fill"></i>
               </button>
             </div>
             <button type="button" class="change-photo-btn" @click="triggerFileSelect">Trocar foto</button>
@@ -180,7 +180,7 @@ onMounted(load)
 </template>
 
 <style scoped>
-.content {
+.content-profile {
   max-width: 48rem;
   margin: 0 auto;
 }
@@ -258,7 +258,7 @@ onMounted(load)
   color: var(--color-primary);
 }
 
-.edit-btn svg {
+.edit-btn {
   width: 16px;
   height: 16px;
 }
@@ -271,7 +271,7 @@ onMounted(load)
   color: var(--color-text-muted);
 }
 
-.section-header svg {
+.section-header {
   width: 18px;
   height: 18px;
 }
@@ -322,7 +322,10 @@ onMounted(load)
   padding: 1.2rem 1.5rem;
   border-bottom: 1px solid var(--color-border);
 }
-.modal-header h2 { font-size: 1.05rem; margin: 0; }
+.modal-header h2 { 
+  font-size: 1.05rem; 
+  margin: 0; 
+}
 .close-btn {
   background: none;
   border: none;
@@ -330,7 +333,11 @@ onMounted(load)
   color: var(--color-text-muted);
   display: flex;
 }
-.close-btn svg { width: 20px; height: 20px; }
+.close-btn  { 
+  width: 20px; 
+  height: 20px; 
+}
+
 .modal-body {
   padding: 1.5rem;
   display: flex;
@@ -364,7 +371,10 @@ onMounted(load)
   justify-content: center;
   cursor: pointer;
 }
-.camera-btn svg { width: 13px; height: 13px; }
+.camera-btn { 
+  width: 13px; 
+  height: 13px; 
+}
 .change-photo-btn {
   background: var(--color-background);
   border: 1px solid var(--color-border);
@@ -375,8 +385,16 @@ onMounted(load)
   cursor: pointer;
   color: var(--color-text);
 }
-.hidden-input { display: none; }
-label { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.85rem; color: var(--color-text-muted); }
+.hidden-input { 
+  display: none; 
+}
+label { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.35rem; 
+  font-size: 0.85rem; 
+  color: var(--color-text-muted); 
+}
 input, textarea {
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--color-border);
