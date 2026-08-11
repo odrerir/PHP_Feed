@@ -4,6 +4,7 @@ import { fetchHome, createPost } from '@/api/posts'
 import { useAuthStore } from '@/stores/auth'
 import PostCard from '@/components/PostCard.vue'
 import Avatar from '@/components/Avatar.vue'
+import Spinner from '@/components/Spinner.vue'
 
 const auth = useAuthStore()
 
@@ -12,6 +13,7 @@ const page = ref(1)
 const lastPage = ref(1)
 const loading = ref(true)
 const loadingMore = ref(false)
+const fileInput = ref(null)
 
 const suggestions = ref([])
 
@@ -84,8 +86,14 @@ onMounted(async () => {
 
         <form v-else @submit.prevent="handleCreatePost" class="new-post-form">
           <textarea v-model="caption" placeholder="Legenda (opcional)" rows="2" />
-          <label for="media-upload" class="file-upload-btn">Escolher imagem</label>
-          <input id="media-upload" class="file-input-hidden" type="file" accept="image/*" required @change="handleFileChange" />
+          <div class="file-picker">
+            <label for="media-upload" class="file-upload-btn">
+              <i class="bi bi-image"></i>
+              {{ mediaFile ? 'Trocar imagem' : 'Escolher imagem' }}
+            </label>
+            <span v-if="mediaFile" class="file-name">{{ mediaFile.name }}</span>
+            <input id="media-upload" type="file" accept="image/*" class="hidden-input" @change="handleFileChange" />
+          </div>
           <span v-if="errors.media" class="error">{{ errors.media[0] }}</span>
           <div class="form-actions">
             <button type="submit" :disabled="posting">{{ posting ? 'Publicando...' : 'Publicar' }}</button>
@@ -94,7 +102,7 @@ onMounted(async () => {
         </form>
       </div>
 
-      <div v-if="loading">Carregando feed...</div>
+      <Spinner v-if="loading" />
 
       <div v-else>
         <p v-if="posts.length === 0" class="empty-msg">Nenhum post ainda. Siga alguém ou crie o primeiro!</p>
@@ -220,6 +228,43 @@ onMounted(async () => {
 
 .file-input-hidden {
   display: none;
+}
+
+.hidden-input { 
+  display: none; 
+}
+
+.file-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.file-picker i{
+  margin-right: 0.4rem;
+}
+
+.file-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.file-name {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
 }
 
 .form-actions {

@@ -4,6 +4,7 @@ import { fetchUserProfile, followUser, unfollowUser } from '@/api/profile'
 import { fetchUserPosts } from '@/api/posts'
 import Avatar from '@/components/Avatar.vue'
 import PostGrid from '@/components/PostGrid.vue'
+import Spinner from '@/components/Spinner.vue'
 
 const props = defineProps(['username'])
 
@@ -51,7 +52,7 @@ watch(() => props.username, () => {
 </script>
 
 <template>
-  <div v-if="loading">Carregando...</div>
+  <Spinner v-if="loading" />
 
   <div v-else-if="profile" class="content-profile">
     <div class="profile-card">

@@ -41,13 +41,11 @@ const imageUrl = computed(() => (props.avatarPath ? `${STORAGE_URL}/${props.avat
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  text-decoration: none;
   border: 2px solid var(--color-avatar-ring);
 }
 .avatar-fallback {
   display: flex;
   align-items: center;
-  text-decoration: none;
   justify-content: center;
   color: var(--color-text);
   font-weight: 600;

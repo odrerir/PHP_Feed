@@ -6,6 +6,7 @@ import { STORAGE_URL } from '@/api/axios'
 import { useAuthStore } from '@/stores/auth'
 import { timeAgo } from '@/lib/time'
 import Avatar from '@/components/Avatar.vue'
+import Spinner from '@/components/Spinner.vue'
 
 const props = defineProps(['id'])
 const router = useRouter()
@@ -88,7 +89,7 @@ watch(() => props.id, load)
 </script>
 
 <template>
-  <div v-if="loading">Carregando...</div>
+  <Spinner v-if="loading" />
 
   <div v-else-if="post" class="post-detail">
     <div class="media-side">

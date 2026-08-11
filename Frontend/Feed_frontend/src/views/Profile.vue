@@ -6,6 +6,7 @@ import { fetchUserPosts } from '@/api/posts'
 import { STORAGE_URL } from '@/api/axios'
 import Avatar from '@/components/Avatar.vue'
 import PostGrid from '@/components/PostGrid.vue'
+import Spinner from '@/components/Spinner.vue'
 
 const BIO_MAX_LENGTH = 500
 
@@ -89,7 +90,7 @@ onMounted(load)
 </script>
 
 <template>
-  <div v-if="loading">Carregando...</div>
+  <Spinner v-if="loading" />
 
   <div v-else-if="profile" class="content-profile">
     <div class="profile-card">

@@ -86,7 +86,7 @@ async function handleLogout() {
     </div>
 
     <div class="nav-right">
-      <router-link :to="{ name: 'profile' }">
+      <router-link :to="{ name: 'profile' }" class="avatar-link">
         <Avatar :name="auth.user?.name || ''" :avatar-path="auth.user?.avatar_path" :size="60" />
       </router-link>
       <button class="logout-btn" @click="handleLogout" title="Sair">
@@ -207,6 +207,11 @@ async function handleLogout() {
   font-size: 0.78rem;
   color: var(--color-text-muted);
   margin: 0;
+}
+.avatar-link {
+  display: inline-flex;
+  text-decoration: none;
+  color: inherit;
 }
 .nav-right {
   display: flex;
