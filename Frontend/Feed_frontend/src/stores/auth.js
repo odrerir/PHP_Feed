@@ -6,6 +6,7 @@ import api from '@/api/axios'
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const token = ref(localStorage.getItem('auth_token'))
+  let fetchUserPromise = null
 
   const isAuthenticated = computed(() => !!token.value)
 
@@ -28,8 +29,15 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchUser() {
-    const response = await api.get('/me')
-    user.value = response.data
+    if (user.value) return // já tem em memória, não busca de novo
+    if (fetchUserPromise) return fetchUserPromise // já tem uma busca em andamento, reaproveita
+
+    fetchUserPromise = api.get('/me').then((response) => {
+      user.value = response.data
+      fetchUserPromise = null
+    })
+
+    return fetchUserPromise
   }
 
   function setSession(data) {

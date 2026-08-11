@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { fetchFeed, createPost } from '@/api/posts'
-import { searchUsers } from '@/api/search'
+import { fetchHome, createPost } from '@/api/posts'
 import { useAuthStore } from '@/stores/auth'
 import PostCard from '@/components/PostCard.vue'
 import Avatar from '@/components/Avatar.vue'
@@ -15,7 +14,6 @@ const loading = ref(true)
 const loadingMore = ref(false)
 
 const suggestions = ref([])
-const loadingSuggestions = ref(false)
 
 const showForm = ref(false)
 const caption = ref('')
@@ -23,30 +21,17 @@ const mediaFile = ref(null)
 const posting = ref(false)
 const errors = ref({})
 
-async function loadFeed(pageNumber = 1) {
-  const { data } = await fetchFeed(pageNumber)
-  posts.value = pageNumber === 1 ? data.data : [...posts.value, ...data.data]
-  page.value = data.current_page
-  lastPage.value = data.last_page
-}
-
-async function loadSuggestions() {
-  loadingSuggestions.value = true
-  try {
-    // reaproveita o endpoint de busca sem termo nenhum, que já devolve
-    // todos os usuários exceto você mesmo — pega só os 4 primeiros
-    const { data } = await searchUsers('')
-    suggestions.value = data.data.slice(0, 4)
-  } catch (err) {
-    suggestions.value = []
-  } finally {
-    loadingSuggestions.value = false
-  }
+async function loadHome(pageNumber = 1) {
+  const { data } = await fetchHome(pageNumber)
+  posts.value = pageNumber === 1 ? data.feed.data : [...posts.value, ...data.feed.data]
+  page.value = data.feed.current_page
+  lastPage.value = data.feed.last_page
+  if (pageNumber === 1) suggestions.value = data.suggestions
 }
 
 async function loadMore() {
   loadingMore.value = true
-  await loadFeed(page.value + 1)
+  await loadHome(page.value + 1)
   loadingMore.value = false
 }
 
@@ -67,7 +52,7 @@ async function handleCreatePost() {
     caption.value = ''
     mediaFile.value = null
     showForm.value = false
-    await loadFeed(1)
+    await loadHome(1)
   } catch (err) {
     if (err.response?.status === 422) errors.value = err.response.data.errors || {}
   } finally {
@@ -77,9 +62,8 @@ async function handleCreatePost() {
 
 onMounted(async () => {
   loading.value = true
-  await loadFeed(1)
+  await loadHome(1)
   loading.value = false
-  loadSuggestions()
 })
 </script>
 

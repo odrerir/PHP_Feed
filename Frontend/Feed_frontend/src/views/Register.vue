@@ -58,7 +58,7 @@ async function handleSubmit() {
 
         <label>
           E-mail
-          <input v-model="form.email" type="email" placeholder="voce@email.com" required />
+          <input v-model="form.email" type="email" placeholder="exemplo@email.com" required />
           <span v-if="errors.email" class="error">{{ errors.email[0] }}</span>
         </label>
 

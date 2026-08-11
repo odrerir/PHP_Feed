@@ -137,7 +137,7 @@ watch(() => props.username, () => {
   color: white;
 }
 
-.follow-btn  {
+.follow-btn i {
   width: 16px;
   height: 16px;
 }

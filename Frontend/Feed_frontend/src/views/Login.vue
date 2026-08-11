@@ -32,7 +32,7 @@ async function handleSubmit() {
 <template>
   <div class="auth-page">
     <h1 class="logo">Muse</h1>
-    <p class="tagline">Fotos com calma. Bem-vinda de volta.</p>
+    <p class="tagline">Fotos com calma, Bem-vindo de volta.</p>
 
     <div class="auth-card">
       <form @submit.prevent="handleSubmit">

@@ -258,7 +258,7 @@ onMounted(load)
   color: var(--color-primary);
 }
 
-.edit-btn {
+.edit-btn i{
   width: 16px;
   height: 16px;
 }

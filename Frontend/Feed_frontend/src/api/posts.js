@@ -1,7 +1,7 @@
 import api from './axios'
 
-export function fetchFeed(page = 1) {
-  return api.get('/posts', { params: { page } })
+export function fetchHome(page = 1) {
+  return api.get('/home', { params: { page } })
 }
 
 export function createPost(formData) {

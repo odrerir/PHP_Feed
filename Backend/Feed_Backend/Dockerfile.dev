@@ -12,6 +12,7 @@ WORKDIR /app
 COPY . .
 
 RUN composer install
+RUN php artisan storage:link || true
 
 EXPOSE 8000
 

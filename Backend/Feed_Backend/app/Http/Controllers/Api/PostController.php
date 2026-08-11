@@ -102,4 +102,26 @@ class PostController extends Controller
 
         return response()->json($this->postService->byUser($user, $request->user()));
     }
+
+    #[OA\Get(
+        path: '/api/posts/feed-with-suggestions',
+        tags: ['Posts'],
+        summary: 'Obter feed de posts com sugestões',
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Feed de posts e sugestões'),
+        ]
+    )]
+    public function feedWithSuggestions(Request $request): JsonResponse
+    {
+        $viewer = $request->user();
+
+        return response()->json([
+            'feed' => $this->postService->feed($viewer),
+            'suggestions' => \App\Models\User::where('id', '!=', $viewer->id)
+                ->inRandomOrder()
+                ->limit(4)
+                ->get(['id', 'name', 'username', 'avatar_path']),
+        ]);
+    }
 }
