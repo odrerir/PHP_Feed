@@ -24,8 +24,8 @@ export function unlikePost(id) {
   return api.delete(`/posts/${id}/like`)
 }
 
-export function fetchComments(id) {
-  return api.get(`/posts/${id}/comments`)
+export function fetchComments(id, page = 1) {
+  return api.get(`/posts/${id}/comments`, { params: { page } })
 }
 
 export function createComment(id, content) {

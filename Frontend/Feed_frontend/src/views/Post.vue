@@ -17,6 +17,8 @@ const loading = ref(true)
 const newComment = ref('')
 const commenting = ref(false)
 const deleting = ref(false)
+const commentsPage = ref(1)
+const commentsLastPage = ref(1)
 
 function mediaUrl(path) {
   return path ? `${STORAGE_URL}/${path}` : null
@@ -29,8 +31,16 @@ async function load() {
     fetchComments(props.id),
   ])
   post.value = postRes.data
-  comments.value = commentsRes.data
+  comments.value = commentsRes.data.data
+  commentsPage.value = commentsRes.data.current_page
+  commentsLastPage.value = commentsRes.data.last_page
   loading.value = false
+}
+
+async function loadMoreComments() {
+  const { data } = await fetchComments(props.id, commentsPage.value + 1)
+  comments.value = [...comments.value, ...data.data]
+  commentsPage.value = data.current_page
 }
 
 async function toggleLike() {
@@ -115,6 +125,9 @@ watch(() => props.id, load)
             <span class="comment-time">{{ timeAgo(comment.created_at) }}</span>
           </div>
         </div>
+        <button v-if="commentsPage < commentsLastPage" class="load-more-comments" @click="loadMoreComments">
+          Carregar mais comentários
+        </button>
       </div>
 
       <div class="panel-actions">

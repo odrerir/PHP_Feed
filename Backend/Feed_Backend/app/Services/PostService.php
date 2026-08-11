@@ -12,6 +12,7 @@ class PostService
     {
         return Post::with('user')
             ->withCount(['comments', 'likes'])
+            ->withExists(['likes as is_liked' => fn ($q) => $q->where('user_id', $viewer->id)])
             ->latest()
             ->paginate($perPage)
             ->through(fn (Post $post) => $this->formatPost($post, $viewer));
@@ -28,7 +29,10 @@ class PostService
 
     public function showWithDetails(Post $post, User $viewer): array
     {
-        $post->loadCount(['comments', 'likes'])->load('user');
+        $post->loadCount(['comments', 'likes'])
+            ->loadExists(['likes as is_liked' => fn ($q) => $q->where('user_id', $viewer->id)])
+            ->load('user');
+
         return $this->formatPost($post, $viewer);
     }
 
@@ -50,7 +54,7 @@ class PostService
             'user'           => $post->user,
             'comments_count' => $post->comments_count,
             'likes_count'    => $post->likes_count,
-            'is_liked'       => $post->isLikedBy($viewer),
+            'is_liked'       => (bool) $post->is_liked,
         ];
     }
 
@@ -59,6 +63,7 @@ class PostService
         return Post::where('user_id', $user->id)
             ->with('user')
             ->withCount(['comments', 'likes'])
+            ->withExists(['likes as is_liked' => fn ($q) => $q->where('user_id', $viewer->id)])
             ->latest()
             ->paginate($perPage)
             ->through(fn (Post $post) => $this->formatPost($post, $viewer));
