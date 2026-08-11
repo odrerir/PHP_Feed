@@ -24,5 +24,11 @@ class StoreCommentRequest extends FormRequest
     {
         return ['content' => ['required', 'string', 'max:1000']];
     }
-    
+    public function messages(): array
+    {
+        return [
+            'content.required' => 'Escreva algo para comentar.',
+            'content.max' => 'O comentário pode ter no máximo :max caracteres.',
+        ];
+    }
 }

@@ -27,4 +27,13 @@ class StorePostRequest extends FormRequest
             'media'   => ['required', 'image', 'max:5120'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'media.required' => 'Escolha uma imagem para o post.',
+            'media.image' => 'O arquivo precisa ser uma imagem.',
+            'media.max' => 'A imagem não pode passar de 5MB.',
+            'caption.max' => 'A legenda pode ter no máximo :max caracteres.',
+        ];
+    }
 }
