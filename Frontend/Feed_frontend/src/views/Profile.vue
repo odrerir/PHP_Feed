@@ -91,7 +91,7 @@ onMounted(load)
 <template>
   <div v-if="loading">Carregando...</div>
 
-  <div v-else-if="profile">
+  <div v-else-if="profile" class="content">
     <div class="profile-card">
       <Avatar :name="profile.user.name" :avatar-path="profile.user.avatar_path" :size="96" />
 
@@ -180,6 +180,11 @@ onMounted(load)
 </template>
 
 <style scoped>
+.content {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
 .profile-card {
   display: flex;
   align-items: center;
@@ -191,31 +196,92 @@ onMounted(load)
   box-shadow: var(--shadow-card);
   flex-wrap: wrap;
 }
-.profile-info { flex: 1; min-width: 200px; }
-.profile-info h1 { margin: 0; font-size: 1.3rem; }
-.username { color: var(--color-text-muted); margin: 0.15rem 0 0.6rem; }
-.bio { margin: 0 0 1rem; font-size: 0.9rem; }
-.stats { display: flex; gap: 2rem; }
-.stats div { display: flex; flex-direction: column; }
-.stats strong { font-size: 1.1rem; }
-.stats span { font-size: 0.78rem; color: var(--color-text-muted); }
+
+.profile-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.profile-info h1 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.username {
+  color: var(--color-text-muted);
+  margin: 0.15rem 0 0.6rem;
+}
+
+.bio {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats strong {
+  font-size: 1.1rem;
+}
+
+.stats span {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
 .edit-btn {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   background: var(--color-surface);
+  color: var(--color-text);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  padding: 10px 18px;
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
   cursor: pointer;
   align-self: flex-start;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
-.edit-btn svg { width: 16px; height: 16px; }
-.section-header { display: flex; align-items: center; gap: 0.5rem; margin: 2rem 0 1rem; color: var(--color-text-muted); }
-.section-header svg { width: 18px; height: 18px; }
-.section-header h2 { font-size: 0.9rem; margin: 0; font-weight: 600; }
+
+.edit-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.edit-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0 1rem;
+  color: var(--color-text-muted);
+}
+
+.section-header svg {
+  width: 18px;
+  height: 18px;
+}
+
+.section-header h2 {
+  font-size: 0.9rem;
+  margin: 0;
+  font-weight: 600;
+}
+
 .load-more-btn {
   display: block;
   width: 100%;
@@ -227,6 +293,7 @@ onMounted(load)
   cursor: pointer;
   font-family: inherit;
 }
+
 
 /* Modal */
 .modal-overlay {

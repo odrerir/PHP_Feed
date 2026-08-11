@@ -81,7 +81,7 @@ onMounted(async () => {
         <template v-if="!showForm">
           <Avatar :name="auth.user?.name || ''" :avatar-path="auth.user?.avatar_path" :size="40" />
           <button class="composer-prompt" @click="showForm = true">
-            No que você está pensando hoje, {{ auth.user?.name?.split(' ')[0] || '' }}?
+            Compartilhe com seus amigos {{ auth.user?.name?.split(' ')[0] || '' }}
           </button>
           <button class="new-post-btn" @click="showForm = true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
@@ -114,19 +114,22 @@ onMounted(async () => {
     <aside class="sidebar">
       <div class="suggestions-card">
         <h2>Talvez você goste</h2>
-        <router-link
+        <div
           v-for="user in suggestions"
           :key="user.id"
-          :to="{ name: 'user-profile', params: { username: user.username } }"
           class="suggestion-row"
         >
           <Avatar :name="user.name" :avatar-path="user.avatar_path" :size="38" />
           <div class="suggestion-info">
-            <strong>{{ user.name }}</strong>
+            <router-link :to="{ name: 'user-profile', params: { username: user.username } }" class="name-link">
+              <strong>{{ user.name }}</strong>
+            </router-link>
             <span>@{{ user.username }}</span>
           </div>
-          <span class="ver-link">ver</span>
-        </router-link>
+          <router-link :to="{ name: 'user-profile', params: { username: user.username } }" class="ver-link">
+            <span>ver</span>
+          </router-link>
+        </div>
       </div>
     </aside>
   </div>
@@ -239,11 +242,40 @@ onMounted(async () => {
   text-decoration: none;
   color: inherit;
 }
-.suggestion-info { flex: 1; min-width: 0; }
-.suggestion-info strong { display: block; font-size: 0.85rem; }
-.suggestion-info span { font-size: 0.76rem; color: var(--color-text-muted); }
-.ver-link { font-size: 0.8rem; color: var(--color-primary); font-weight: 600; }
-.error { color: var(--color-error); font-size: 0.8rem; }
+.suggestion-info { 
+  flex: 1; 
+  min-width: 
+  0; 
+}
+.suggestion-info strong { 
+  display: block; 
+  font-size: 
+  0.85rem; 
+}
+.suggestion-info span { 
+  font-size: 0.76rem; 
+  color: var(--color-text-muted); 
+}
+.name-link {  
+  font-size: 14px;
+  color: var(--color-text);
+  text-decoration: none;
+  width: fit-content;
+  transition: color 0.15s;
+}
+.name-link:hover {
+  color: var(--color-primary);
+}
+.ver-link { 
+  font-size: 0.9rem; 
+  text-decoration: none;
+  color: var(--color-primary); 
+  font-weight: 600; 
+}
+.error { 
+  color: var(--color-error); 
+  font-size: 0.8rem; 
+}
 @media (max-width: 860px) {
   .home-layout { grid-template-columns: 1fr; }
   .sidebar { display: none; }

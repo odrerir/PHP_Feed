@@ -53,7 +53,7 @@ watch(() => props.username, () => {
 <template>
   <div v-if="loading">Carregando...</div>
 
-  <div v-else-if="profile">
+  <div v-else-if="profile" class="content">
     <div class="profile-card">
       <Avatar :name="profile.user.name" :avatar-path="profile.user.avatar_path" :size="96" />
 
@@ -94,6 +94,11 @@ watch(() => props.username, () => {
 </template>
 
 <style scoped>
+.content {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
 .profile-card {
   display: flex;
   align-items: center;
@@ -112,7 +117,11 @@ watch(() => props.username, () => {
 .stats { display: flex; gap: 2rem; }
 .stats div { display: flex; flex-direction: column; }
 .stats strong { font-size: 1.1rem; }
-.stats span { font-size: 0.78rem; color: var(--color-text-muted); }
+.stats span {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
 .follow-btn {
   display: flex;
   align-items: center;
@@ -128,15 +137,37 @@ watch(() => props.username, () => {
   background: var(--color-primary);
   color: white;
 }
-.follow-btn svg { width: 16px; height: 16px; }
+
+.follow-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .follow-btn.following {
   background: var(--color-background);
   color: var(--color-text);
   border: 1px solid var(--color-border);
 }
-.section-header { display: flex; align-items: center; gap: 0.5rem; margin: 2rem 0 1rem; color: var(--color-text-muted); }
-.section-header svg { width: 18px; height: 18px; }
-.section-header h2 { font-size: 0.9rem; margin: 0; font-weight: 600; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0 1rem;
+  color: var(--color-text-muted);
+}
+
+.section-header svg {
+  width: 18px;
+  height: 18px;
+}
+
+.section-header h2 {
+  font-size: 0.9rem;
+  margin: 0;
+  font-weight: 600;
+}
+
 .load-more-btn {
   display: block;
   width: 100%;

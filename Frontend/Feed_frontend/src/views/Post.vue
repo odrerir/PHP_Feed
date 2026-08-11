@@ -121,20 +121,65 @@ watch(() => props.id, load)
 </template>
 
 <style scoped>
-.post-header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; font-weight: 600; }
-.post-header a { color: inherit; text-decoration: none; }
-.delete-btn { background: none; border: 1px solid #e0245e; color: #e0245e; border-radius: 4px; padding: 0.25rem 0.6rem; cursor: pointer; }
-.media { width: 100%; border-radius: 8px; }
-.actions { display: flex; gap: 1rem; padding: 0.5rem 0; }
-.actions button { background: none; border: none; cursor: pointer; font-size: 1rem; }
-.liked { color: #e0245e; }
-.caption { margin-bottom: 1rem; }
-.comments { border-top: 1px solid #dbdbdb; padding-top: 1rem; }
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  font-weight: 600;
+}
+
+.post-header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.delete-btn {
+  background: none;
+  border: 1px solid #e0245e;
+  color: #e0245e;
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+.media {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.liked {
+  color: #e0245e;
+}
+
+.caption {
+  margin-bottom: 1rem;
+}
+
+.comments {
+  border-top: 1px solid #dbdbdb;
+  padding-top: 1rem;
+}
+
 .comment-form {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
+
 .post-user {
   display: inline-flex;
   align-items: center;
@@ -142,6 +187,7 @@ watch(() => props.id, load)
   color: inherit;
   text-decoration: none;
 }
+
 .post-avatar {
   width: 3.5rem;
   height: 3.5rem;

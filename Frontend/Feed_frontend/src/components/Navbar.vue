@@ -76,7 +76,7 @@ async function handleLogout() {
           class="dropdown-item"
           @mousedown.prevent="selectUser(user.username)"
         >
-          <Avatar :name="user.name" :avatar-path="user.avatar_path" :size="36" />
+          <Avatar :name="user.name" :avatar-path="user.avatar_path" :size="40" />
           <div class="dropdown-user-info">
             <strong>{{ user.name }}</strong>
             <p>@{{ user.username }}</p>
@@ -87,7 +87,7 @@ async function handleLogout() {
 
     <div class="nav-right">
       <router-link :to="{ name: 'profile' }">
-        <Avatar :name="auth.user?.name || ''" :avatar-path="auth.user?.avatar_path" :size="38" />
+        <Avatar :name="auth.user?.name || ''" :avatar-path="auth.user?.avatar_path" :size="60" />
       </router-link>
       <button class="logout-btn" @click="handleLogout" title="Sair">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -215,10 +215,17 @@ async function handleLogout() {
 }
 .logout-btn {
   background: none;
+  padding: 0.4rem;
   border: none;
   cursor: pointer;
   color: var(--color-text-muted);
   display: flex;
+  transition: color 0.15s;
+}
+.logout-btn:hover {
+  color: var(--color-error);
+  border-radius: 8px;
+  background-color: var(--color-border);
 }
 .logout-btn svg {
   width: 20px;

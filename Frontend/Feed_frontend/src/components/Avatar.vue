@@ -5,7 +5,7 @@ import { STORAGE_URL } from '@/api/axios'
 const props = defineProps({
   name: { type: String, default: '' },
   avatarPath: { type: String, default: null },
-  size: { type: Number, default: 40 },
+  size: { type: Number, default: 44 },
 })
 
 const colors = ['#f6d9a0', '#f4b8c8', '#c9c2f0', '#bcd4f6', '#c8e6c9']

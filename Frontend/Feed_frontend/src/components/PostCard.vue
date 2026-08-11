@@ -28,7 +28,7 @@ async function toggleLike() {
 <template>
   <article class="post-card">
     <header>
-      <Avatar :name="post.user.name" :avatar-path="post.user.avatar_path" :size="40" />
+      <Avatar :name="post.user.name" :avatar-path="post.user.avatar_path" :size="44" />
       <div class="author-info">
         <router-link :to="{ name: 'user-profile', params: { username: post.user.username } }" class="author-name">
           {{ post.user.name }}

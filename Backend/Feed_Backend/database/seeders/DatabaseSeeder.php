@@ -10,15 +10,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $users = User::factory(15)->create();
-        $users->each(function (User $user) {
-            $user->profile()->create([
-                'avatar' => fake()->sentence(),
-            ]);
-        });
         $users->each(function (User $user) use ($users) {
             Post::factory(rand(1, 5))->create(['user_id' => $user->id])
                 ->each(function (Post $post) use ($users) {
-                    $users->random(rand(0, 8))->each(
+                    $users->random(rand(2, 8))->each(
                         fn (User $liker) => $post->likes()->firstOrCreate(['user_id' => $liker->id])
                     );
                     $users->random(rand(0, 4))->each(
