@@ -1,72 +1,71 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { fetchHome, createPost } from '@/api/posts'
-import { useAuthStore } from '@/stores/auth'
-import PostCard from '@/components/PostCard.vue'
-import Avatar from '@/components/Avatar.vue'
-import Spinner from '@/components/Spinner.vue'
+import { ref, onMounted } from 'vue';
+import { fetchHome, createPost } from '@/api/posts';
+import { useAuthStore } from '@/stores/auth';
+import PostCard from '@/components/PostCard.vue';
+import Avatar from '@/components/Avatar.vue';
+import Spinner from '@/components/Spinner.vue';
 
-const auth = useAuthStore()
+const auth = useAuthStore();
 
-const posts = ref([])
-const page = ref(1)
-const lastPage = ref(1)
-const loading = ref(true)
-const loadingMore = ref(false)
-const fileInput = ref(null)
+const posts = ref([]);
+const page = ref(1);
+const lastPage = ref(1);
+const loading = ref(true);
+const loadingMore = ref(false);
 
-const suggestions = ref([])
+const suggestions = ref([]);
 
-const showForm = ref(false)
-const caption = ref('')
-const mediaFile = ref(null)
-const posting = ref(false)
-const errors = ref({})
+const showForm = ref(false);
+const caption = ref('');
+const mediaFile = ref(null);
+const posting = ref(false);
+const errors = ref({});
 
 async function loadHome(pageNumber = 1) {
-  const { data } = await fetchHome(pageNumber)
-  posts.value = pageNumber === 1 ? data.feed.data : [...posts.value, ...data.feed.data]
-  page.value = data.feed.current_page
-  lastPage.value = data.feed.last_page
-  if (pageNumber === 1) suggestions.value = data.suggestions
+  const { data } = await fetchHome(pageNumber);
+  posts.value = pageNumber === 1 ? data.feed.data : [...posts.value, ...data.feed.data];
+  page.value = data.feed.current_page;
+  lastPage.value = data.feed.last_page;
+  if (pageNumber === 1) suggestions.value = data.suggestions;
 }
 
 async function loadMore() {
-  loadingMore.value = true
-  await loadHome(page.value + 1)
-  loadingMore.value = false
+  loadingMore.value = true;
+  await loadHome(page.value + 1);
+  loadingMore.value = false;
 }
 
 function handleFileChange(event) {
-  mediaFile.value = event.target.files[0] || null
+  mediaFile.value = event.target.files[0] || null;
 }
 
 async function handleCreatePost() {
-  errors.value = {}
-  posting.value = true
+  errors.value = {};
+  posting.value = true;
 
-  const formData = new FormData()
-  formData.append('caption', caption.value)
-  if (mediaFile.value) formData.append('media', mediaFile.value)
+  const formData = new FormData();
+  formData.append('caption', caption.value);
+  if (mediaFile.value) formData.append('media', mediaFile.value);
 
   try {
-    await createPost(formData)
-    caption.value = ''
-    mediaFile.value = null
-    showForm.value = false
-    await loadHome(1)
+    await createPost(formData);
+    caption.value = '';
+    mediaFile.value = null;
+    showForm.value = false;
+    await loadHome(1);
   } catch (err) {
-    if (err.response?.status === 422) errors.value = err.response.data.errors || {}
+    if (err.response?.status === 422) errors.value = err.response.data.errors || {};
   } finally {
-    posting.value = false
+    posting.value = false;
   }
 }
 
 onMounted(async () => {
-  loading.value = true
-  await loadHome(1)
-  loading.value = false
-})
+  loading.value = true;
+  await loadHome(1);
+  loading.value = false;
+});
 </script>
 
 <template>
@@ -74,7 +73,6 @@ onMounted(async () => {
     <div class="feed-column">
       <div class="composer-card">
         <template v-if="!showForm">
-
           <Avatar :name="auth.user?.name || ''" :avatar-path="auth.user?.avatar_path" :size="40" />
 
           <button class="composer-prompt" @click="showForm = true">
@@ -85,11 +83,9 @@ onMounted(async () => {
             <i class="bi bi-image"></i>
             Novo post
           </button>
-          
         </template>
 
         <form v-else @submit.prevent="handleCreatePost" class="new-post-form">
-
           <textarea v-model="caption" placeholder="Legenda (opcional)" rows="2" />
 
           <div class="file-picker">
@@ -100,13 +96,21 @@ onMounted(async () => {
               {{ mediaFile ? 'Trocar imagem' : 'Escolher imagem' }}
             </label>
 
-            <input id="media-upload" type="file" accept="image/*" class="hidden-input" @change="handleFileChange" />
+            <input
+              id="media-upload"
+              type="file"
+              accept="image/*"
+              class="hidden-input"
+              @change="handleFileChange"
+            />
           </div>
 
           <span v-if="errors.media" class="error">{{ errors.media[0] }}</span>
 
           <div class="form-actions">
-            <button type="submit" :disabled="posting">{{ posting ? 'Publicando...' : 'Publicar' }}</button>
+            <button type="submit" :disabled="posting">
+              {{ posting ? 'Publicando...' : 'Publicar' }}
+            </button>
             <button type="button" class="cancel-btn" @click="showForm = false">Cancelar</button>
           </div>
         </form>
@@ -115,40 +119,45 @@ onMounted(async () => {
       <Spinner v-if="loading" />
 
       <div v-else>
-        <p v-if="posts.length === 0" class="empty-msg">Nenhum post ainda. Siga alguém ou crie o primeiro!</p>
+        <p v-if="posts.length === 0" class="empty-msg">
+          Nenhum post ainda. Siga alguém ou crie o primeiro!
+        </p>
 
         <PostCard v-for="post in posts" :key="post.id" :post="post" />
 
-        <button v-if="page < lastPage" class="load-more-btn" @click="loadMore" :disabled="loadingMore">
+        <button
+          v-if="page < lastPage"
+          class="load-more-btn"
+          @click="loadMore"
+          :disabled="loadingMore"
+        >
           {{ loadingMore ? 'Carregando...' : 'Carregar mais' }}
         </button>
-
       </div>
     </div>
 
     <aside class="sidebar">
       <div class="suggestions-card">
         <h2>Talvez você goste</h2>
-        <div
-          v-for="user in suggestions"
-          :key="user.id"
-          class="suggestion-row"
-        >
+        <div v-for="user in suggestions" :key="user.id" class="suggestion-row">
           <Avatar :name="user.name" :avatar-path="user.avatar_path" :size="38" />
           <div class="suggestion-info">
-
-            <router-link :to="{ name: 'user-profile', params: { username: user.username } }" class="name-link">
+            <router-link
+              :to="{ name: 'user-profile', params: { username: user.username } }"
+              class="name-link"
+            >
               <strong>{{ user.name }}</strong>
             </router-link>
 
             <span>@{{ user.username }}</span>
-
           </div>
 
-          <router-link :to="{ name: 'user-profile', params: { username: user.username } }" class="ver-link">
+          <router-link
+            :to="{ name: 'user-profile', params: { username: user.username } }"
+            class="ver-link"
+          >
             <span>ver</span>
           </router-link>
-
         </div>
       </div>
     </aside>
@@ -162,7 +171,9 @@ onMounted(async () => {
   gap: 2rem;
   align-items: start;
 }
-.feed-column { min-width: 0; }
+.feed-column {
+  min-width: 0;
+}
 .composer-card {
   display: flex;
   align-items: center;
@@ -202,13 +213,13 @@ onMounted(async () => {
   font-size: 0.88rem;
   cursor: pointer;
 }
-.new-post-btn:hover { 
-  background: var(--color-primary-hover); 
+.new-post-btn:hover {
+  background: var(--color-primary-hover);
 }
 
-.new-post-btn svg { 
-  width: 18px; 
-  height: 18px; 
+.new-post-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .new-post-form {
@@ -249,8 +260,8 @@ onMounted(async () => {
   display: none;
 }
 
-.hidden-input { 
-  display: none; 
+.hidden-input {
+  display: none;
 }
 
 .file-picker {
@@ -301,7 +312,11 @@ onMounted(async () => {
   font-family: inherit;
   color: var(--color-text);
 }
-.empty-msg { color: var(--color-text-muted); text-align: center; padding: 2rem 0; }
+.empty-msg {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 2rem 0;
+}
 .load-more-btn {
   display: block;
   width: 100%;
@@ -313,7 +328,10 @@ onMounted(async () => {
   font-family: inherit;
   color: var(--color-text);
 }
-.sidebar { position: sticky; top: 1rem; }
+.sidebar {
+  position: sticky;
+  top: 1rem;
+}
 .suggestions-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -321,7 +339,10 @@ onMounted(async () => {
   box-shadow: var(--shadow-card);
   padding: 1.2rem;
 }
-.suggestions-card h2 { font-size: 0.95rem; margin: 0 0 1rem; }
+.suggestions-card h2 {
+  font-size: 0.95rem;
+  margin: 0 0 1rem;
+}
 .suggestion-row {
   display: flex;
   align-items: center;
@@ -330,21 +351,19 @@ onMounted(async () => {
   text-decoration: none;
   color: inherit;
 }
-.suggestion-info { 
-  flex: 1; 
-  min-width: 
-  0; 
+.suggestion-info {
+  flex: 1;
+  min-width: 0;
 }
-.suggestion-info strong { 
-  display: block; 
-  font-size: 
-  0.85rem; 
+.suggestion-info strong {
+  display: block;
+  font-size: 0.85rem;
 }
-.suggestion-info span { 
-  font-size: 0.76rem; 
-  color: var(--color-text-muted); 
+.suggestion-info span {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
 }
-.name-link {  
+.name-link {
   font-size: 14px;
   color: var(--color-text);
   text-decoration: none;
@@ -354,18 +373,22 @@ onMounted(async () => {
 .name-link:hover {
   color: var(--color-primary);
 }
-.ver-link { 
-  font-size: 0.9rem; 
+.ver-link {
+  font-size: 0.9rem;
   text-decoration: none;
-  color: var(--color-primary); 
-  font-weight: 600; 
+  color: var(--color-primary);
+  font-weight: 600;
 }
-.error { 
-  color: var(--color-error); 
-  font-size: 0.8rem; 
+.error {
+  color: var(--color-error);
+  font-size: 0.8rem;
 }
 @media (max-width: 860px) {
-  .home-layout { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
+  .home-layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    display: none;
+  }
 }
 </style>

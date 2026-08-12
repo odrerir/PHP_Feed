@@ -1,10 +1,10 @@
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
 
-const router = useRouter()
+const router = useRouter();
 
 function goHome() {
-  router.push({ name: 'home' })
+  router.push({ name: 'home' });
 }
 </script>
 

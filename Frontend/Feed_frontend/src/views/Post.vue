@@ -1,93 +1,97 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { fetchPost, deletePost, fetchComments, createComment, likePost, unlikePost } from '@/api/posts'
-import { STORAGE_URL } from '@/api/axios'
-import { useAuthStore } from '@/stores/auth'
-import { timeAgo } from '@/lib/time'
-import Avatar from '@/components/Avatar.vue'
-import Spinner from '@/components/Spinner.vue'
+import { ref, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import {
+  fetchPost,
+  deletePost,
+  fetchComments,
+  createComment,
+  likePost,
+  unlikePost,
+} from '@/api/posts';
+import { STORAGE_URL } from '@/api/axios';
+import { useAuthStore } from '@/stores/auth';
+import Avatar from '@/components/Avatar.vue';
+import Spinner from '@/components/Spinner.vue';
+import { timeAgo } from '@/lib/time';
 
-const props = defineProps(['id'])
-const router = useRouter()
-const auth = useAuthStore()
+const props = defineProps(['id']);
+const router = useRouter();
+const auth = useAuthStore();
 
-const post = ref(null)
-const comments = ref([])
-const loading = ref(true)
-const newComment = ref('')
-const commenting = ref(false)
-const deleting = ref(false)
-const showDeleteModal = ref(false)
+const post = ref(null);
+const comments = ref([]);
+const loading = ref(true);
+const newComment = ref('');
+const commenting = ref(false);
+const deleting = ref(false);
+const showDeleteModal = ref(false);
 
-const commentsPage = ref(1)
-const commentsLastPage = ref(1)
+const commentsPage = ref(1);
+const commentsLastPage = ref(1);
 
 function mediaUrl(path) {
-  return path ? `${STORAGE_URL}/${path}` : null
+  return path ? `${STORAGE_URL}/${path}` : null;
 }
 
 async function load() {
-  loading.value = true
-  const [postRes, commentsRes] = await Promise.all([
-    fetchPost(props.id),
-    fetchComments(props.id),
-  ])
-  post.value = postRes.data
-  comments.value = commentsRes.data.data
-  commentsPage.value = commentsRes.data.current_page
-  commentsLastPage.value = commentsRes.data.last_page
-  loading.value = false
+  loading.value = true;
+  const [postRes, commentsRes] = await Promise.all([fetchPost(props.id), fetchComments(props.id)]);
+  post.value = postRes.data;
+  comments.value = commentsRes.data.data;
+  commentsPage.value = commentsRes.data.current_page;
+  commentsLastPage.value = commentsRes.data.last_page;
+  loading.value = false;
 }
 
 async function loadMoreComments() {
-  const { data } = await fetchComments(props.id, commentsPage.value + 1)
-  comments.value = [...comments.value, ...data.data]
-  commentsPage.value = data.current_page
+  const { data } = await fetchComments(props.id, commentsPage.value + 1);
+  comments.value = [...comments.value, ...data.data];
+  commentsPage.value = data.current_page;
 }
 
 async function toggleLike() {
-  const wasLiked = post.value.is_liked
-  post.value.is_liked = !wasLiked
-  post.value.likes_count += wasLiked ? -1 : 1
+  const wasLiked = post.value.is_liked;
+  post.value.is_liked = !wasLiked;
+  post.value.likes_count += wasLiked ? -1 : 1;
 
   try {
-    if (wasLiked) await unlikePost(props.id)
-    else await likePost(props.id)
+    if (wasLiked) await unlikePost(props.id);
+    else await likePost(props.id);
   } catch {
-    post.value.is_liked = wasLiked
-    post.value.likes_count += wasLiked ? 1 : -1
+    post.value.is_liked = wasLiked;
+    post.value.likes_count += wasLiked ? 1 : -1;
   }
 }
 
 async function handleComment() {
-  if (!newComment.value.trim()) return
-  commenting.value = true
+  if (!newComment.value.trim()) return;
+  commenting.value = true;
 
   try {
-    const { data } = await createComment(props.id, newComment.value)
-    comments.value.push(data)
-    newComment.value = ''
-    post.value.comments_count += 1
+    const { data } = await createComment(props.id, newComment.value);
+    comments.value.push(data);
+    newComment.value = '';
+    post.value.comments_count += 1;
   } finally {
-    commenting.value = false
+    commenting.value = false;
   }
 }
 
 async function confirmDelete() {
-  deleting.value = true
+  deleting.value = true;
 
   try {
-    await deletePost(props.id)
-    router.push({ name: 'profile' })
+    await deletePost(props.id);
+    router.push({ name: 'profile' });
   } finally {
-    deleting.value = false
-    showDeleteModal.value = false
+    deleting.value = false;
+    showDeleteModal.value = false;
   }
 }
 
-onMounted(load)
-watch(() => props.id, load)
+onMounted(load);
+watch(() => props.id, load);
 </script>
 
 <template>
@@ -102,12 +106,19 @@ watch(() => props.id, load)
       <header class="panel-header">
         <Avatar :name="post.user.name" :avatar-path="post.user.avatar_path" :size="40" />
         <div class="author-info">
-          <router-link :to="{ name: 'user-profile', params: { username: post.user.username } }" class="author-name">
+          <router-link
+            :to="{ name: 'user-profile', params: { username: post.user.username } }"
+            class="author-name"
+          >
             {{ post.user.name }}
           </router-link>
           <span>@{{ post.user.username }}</span>
         </div>
-        <button v-if="post.user.id === auth.user?.id" class="delete-btn" @click="showDeleteModal = true">
+        <button
+          v-if="post.user.id === auth.user?.id"
+          class="delete-btn"
+          @click="showDeleteModal = true"
+        >
           <i class="bi bi-trash"></i>
         </button>
       </header>
@@ -116,7 +127,9 @@ watch(() => props.id, load)
         <div class="comment-row">
           <Avatar :name="post.user.name" :avatar-path="post.user.avatar_path" :size="34" />
           <div class="comment-content">
-            <p><strong>{{ post.user.username }}</strong> {{ post.caption }}</p>
+            <p>
+              <strong>{{ post.user.username }}</strong> {{ post.caption }}
+            </p>
             <span class="comment-time">{{ timeAgo(post.created_at) }}</span>
           </div>
         </div>
@@ -124,11 +137,17 @@ watch(() => props.id, load)
         <div v-for="comment in comments" :key="comment.id" class="comment-row">
           <Avatar :name="comment.user.name" :avatar-path="comment.user.avatar_path" :size="34" />
           <div class="comment-content">
-            <p><strong>{{ comment.user.username }}</strong> {{ comment.content }}</p>
+            <p>
+              <strong>{{ comment.user.username }}</strong> {{ comment.content }}
+            </p>
             <span class="comment-time">{{ timeAgo(comment.created_at) }}</span>
           </div>
         </div>
-        <button v-if="commentsPage < commentsLastPage" class="load-more-comments" @click="loadMoreComments">
+        <button
+          v-if="commentsPage < commentsLastPage"
+          class="load-more-comments"
+          @click="loadMoreComments"
+        >
           Carregar mais comentários
         </button>
       </div>
@@ -206,10 +225,10 @@ watch(() => props.id, load)
   padding: 1rem;
   border-bottom: 1px solid var(--color-border);
 }
-.author-info { 
-  flex: 1; 
-  display: flex; 
-  flex-direction: column; 
+.author-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .author-name {
@@ -221,13 +240,13 @@ watch(() => props.id, load)
   transition: color 0.15s;
 }
 
-.author-name:hover { 
-  color: var(--color-primary); 
+.author-name:hover {
+  color: var(--color-primary);
 }
 
-.author-info span { 
-  font-size: 0.78rem; 
-  color: var(--color-text-muted); 
+.author-info span {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
 }
 .delete-btn {
   background: none;
@@ -237,8 +256,8 @@ watch(() => props.id, load)
   font-size: 1.1rem;
 }
 
-.delete-btn:hover { 
-  color: var(--color-error); 
+.delete-btn:hover {
+  color: var(--color-error);
 }
 
 .panel-body {
@@ -250,24 +269,24 @@ watch(() => props.id, load)
   gap: 1.1rem;
 }
 
-.comment-row { 
-  display: flex; 
-  gap: 0.6rem; 
+.comment-row {
+  display: flex;
+  gap: 0.6rem;
 }
 
-.comment-content p { 
-  margin: 0; 
-  font-size: 0.88rem; 
-  line-height: 1.4; 
+.comment-content p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.4;
 }
 
-.comment-content strong { 
-  margin-right: 0.3rem; 
+.comment-content strong {
+  margin-right: 0.3rem;
 }
 
-.comment-time { 
-  font-size: 0.75rem; 
-  color: var(--color-text-muted); 
+.comment-time {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
 }
 
 .panel-actions {
@@ -290,13 +309,13 @@ watch(() => props.id, load)
   color: var(--color-text);
 }
 
-.icon-btn i { 
-  font-size: 1.25rem; 
-  color: var(--color-text-muted); 
+.icon-btn i {
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
 }
 
-.icon-btn.liked i { 
-  color: var(--color-accent); 
+.icon-btn.liked i {
+  color: var(--color-accent);
 }
 
 .panel-input {
@@ -332,12 +351,12 @@ watch(() => props.id, load)
   cursor: pointer;
   flex-shrink: 0;
 }
-.panel-input button:disabled { 
-  opacity: 0.6; 
-  cursor: not-allowed; 
+.panel-input button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
-.panel-input button i { 
-  font-size: 0.95rem; 
+.panel-input button i {
+  font-size: 0.95rem;
 }
 .modal-overlay {
   position: fixed;
@@ -419,7 +438,12 @@ watch(() => props.id, load)
   padding: 0;
 }
 @media (max-width: 720px) {
-  .post-detail { grid-template-columns: 1fr; }
-  .panel { border-left: none; border-top: 1px solid var(--color-border); }
+  .post-detail {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+  }
 }
 </style>

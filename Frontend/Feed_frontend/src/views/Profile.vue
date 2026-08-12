@@ -1,95 +1,98 @@
 <!-- src/views/Profile.vue -->
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { fetchOwnProfile, updateProfile } from '@/api/profile'
-import { fetchUserPosts } from '@/api/posts'
-import { STORAGE_URL } from '@/api/axios'
-import Avatar from '@/components/Avatar.vue'
-import PostGrid from '@/components/PostGrid.vue'
-import Spinner from '@/components/Spinner.vue'
-import { useAuthStore } from '@/stores/auth'
+import { ref, computed, onMounted } from 'vue';
+import { fetchOwnProfile, updateProfile } from '@/api/profile';
+import { fetchUserPosts } from '@/api/posts';
+import Avatar from '@/components/Avatar.vue';
+import PostGrid from '@/components/PostGrid.vue';
+import Spinner from '@/components/Spinner.vue';
+import { useAuthStore } from '@/stores/auth';
 
-const BIO_MAX_LENGTH = 500
+const BIO_MAX_LENGTH = 500;
 
-const profile = ref(null)
-const loading = ref(true)
-const editing = ref(false)
-const saving = ref(false)
-const errors = ref({})
-const form = ref({ name: '', username: '', bio: '' })
-const avatarFile = ref(null)
-const avatarPreview = ref(null)
-const fileInput = ref(null)
-const auth = useAuthStore()
+const profile = ref(null);
+const loading = ref(true);
+const editing = ref(false);
+const saving = ref(false);
+const errors = ref({});
+const form = ref({ name: '', username: '', bio: '' });
+const avatarFile = ref(null);
+const avatarPreview = ref(null);
+const fileInput = ref(null);
+const auth = useAuthStore();
 
-const posts = ref([])
-const postsPage = ref(1)
-const postsLastPage = ref(1)
+const posts = ref([]);
+const postsPage = ref(1);
+const postsLastPage = ref(1);
 
-const bioLength = computed(() => form.value.bio.length)
+const bioLength = computed(() => form.value.bio.length);
 
 async function loadPosts(page = 1) {
-  const { data } = await fetchUserPosts(profile.value.user.username, page)
-  posts.value = page === 1 ? data.data : [...posts.value, ...data.data]
-  postsPage.value = data.current_page
-  postsLastPage.value = data.last_page
+  const { data } = await fetchUserPosts(profile.value.user.username, page);
+  posts.value = page === 1 ? data.data : [...posts.value, ...data.data];
+  postsPage.value = data.current_page;
+  postsLastPage.value = data.last_page;
 }
 
 async function load() {
-  loading.value = true
-  const { data } = await fetchOwnProfile()
-  profile.value = data
-  form.value = { name: data.user.name, username: data.user.username, bio: data.user.bio || '' }
-  loading.value = false
-  await loadPosts(1)
+  loading.value = true;
+  const { data } = await fetchOwnProfile();
+  profile.value = data;
+  form.value = { name: data.user.name, username: data.user.username, bio: data.user.bio || '' };
+  loading.value = false;
+  await loadPosts(1);
 }
 
 function openEdit() {
-  form.value = { name: profile.value.user.name, username: profile.value.user.username, bio: profile.value.user.bio || '' }
-  avatarFile.value = null
-  avatarPreview.value = null
-  errors.value = {}
-  editing.value = true
+  form.value = {
+    name: profile.value.user.name,
+    username: profile.value.user.username,
+    bio: profile.value.user.bio || '',
+  };
+  avatarFile.value = null;
+  avatarPreview.value = null;
+  errors.value = {};
+  editing.value = true;
 }
 
 function closeEdit() {
-  editing.value = false
+  editing.value = false;
 }
 
 function triggerFileSelect() {
-  fileInput.value.click()
+  fileInput.value.click();
 }
 
 function handleFileChange(event) {
-  const file = event.target.files[0]
-  if (!file) return
-  avatarFile.value = file
-  avatarPreview.value = URL.createObjectURL(file)
+  const file = event.target.files[0];
+  if (!file) return;
+  avatarFile.value = file;
+  avatarPreview.value = URL.createObjectURL(file);
 }
 
 async function handleSave() {
-  errors.value = {}
-  saving.value = true
+  errors.value = {};
+  saving.value = true;
 
-  const formData = new FormData()
-  formData.append('name', form.value.name)
-  formData.append('username', form.value.username)
-  formData.append('bio', form.value.bio)
-  if (avatarFile.value) formData.append('avatar', avatarFile.value)
+  const formData = new FormData();
+  formData.append('name', form.value.name);
+  formData.append('username', form.value.username);
+  formData.append('bio', form.value.bio);
+  if (avatarFile.value) formData.append('avatar', avatarFile.value);
 
   try {
-    await updateProfile(formData)
-    await load()
-    auth.setUser(profile.value.user)
-    editing.value = false
+    await updateProfile(formData);
+    await load();
+    auth.setUser(profile.value.user);
+    editing.value = false;
   } catch (err) {
-    if (err.response?.status === 422) errors.value = err.response.data.errors || {}
+    if (err.response?.status === 422) errors.value = err.response.data.errors || {};
   } finally {
-    saving.value = false
+    saving.value = false;
   }
 }
 
-onMounted(load)
+onMounted(load);
 </script>
 
 <template>
@@ -105,9 +108,18 @@ onMounted(load)
         <p v-if="profile.user.bio" class="bio">{{ profile.user.bio }}</p>
 
         <div class="stats">
-          <div><strong>{{ profile.posts_count }}</strong><span>posts</span></div>
-          <div><strong>{{ profile.followers_count }}</strong><span>seguidores</span></div>
-          <div><strong>{{ profile.following_count }}</strong><span>seguindo</span></div>
+          <div>
+            <strong>{{ profile.posts_count }}</strong
+            ><span>posts</span>
+          </div>
+          <div>
+            <strong>{{ profile.followers_count }}</strong
+            ><span>seguidores</span>
+          </div>
+          <div>
+            <strong>{{ profile.following_count }}</strong
+            ><span>seguindo</span>
+          </div>
         </div>
       </div>
 
@@ -123,7 +135,11 @@ onMounted(load)
     </div>
 
     <PostGrid :posts="posts" />
-    <button v-if="postsPage < postsLastPage" class="load-more-btn" @click="loadPosts(postsPage + 1)">
+    <button
+      v-if="postsPage < postsLastPage"
+      class="load-more-btn"
+      @click="loadPosts(postsPage + 1)"
+    >
       Carregar mais posts
     </button>
 
@@ -141,13 +157,26 @@ onMounted(load)
           <div class="avatar-row">
             <div class="avatar-preview-wrapper">
               <img v-if="avatarPreview" :src="avatarPreview" class="avatar-preview" />
-              <Avatar v-else :name="profile.user.name" :avatar-path="profile.user.avatar_path" :size="72" />
+              <Avatar
+                v-else
+                :name="profile.user.name"
+                :avatar-path="profile.user.avatar_path"
+                :size="72"
+              />
               <button type="button" class="camera-btn" @click="triggerFileSelect">
                 <i class="bi bi-camera-fill"></i>
               </button>
             </div>
-            <button type="button" class="change-photo-btn" @click="triggerFileSelect">Trocar foto</button>
-            <input ref="fileInput" type="file" accept="image/*" class="hidden-input" @change="handleFileChange" />
+            <button type="button" class="change-photo-btn" @click="triggerFileSelect">
+              Trocar foto
+            </button>
+            <input
+              ref="fileInput"
+              type="file"
+              accept="image/*"
+              class="hidden-input"
+              @change="handleFileChange"
+            />
           </div>
 
           <label>
@@ -254,7 +283,11 @@ onMounted(load)
   font-weight: 600;
   cursor: pointer;
   align-self: flex-start;
-  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 
 .edit-btn:hover {
@@ -262,7 +295,7 @@ onMounted(load)
   color: var(--color-primary);
 }
 
-.edit-btn i{
+.edit-btn i {
   width: 16px;
   height: 16px;
 }
@@ -298,7 +331,6 @@ onMounted(load)
   font-family: inherit;
 }
 
-
 /* Modal */
 .modal-overlay {
   position: fixed;
@@ -326,9 +358,9 @@ onMounted(load)
   padding: 1.2rem 1.5rem;
   border-bottom: 1px solid var(--color-border);
 }
-.modal-header h2 { 
-  font-size: 1.05rem; 
-  margin: 0; 
+.modal-header h2 {
+  font-size: 1.05rem;
+  margin: 0;
 }
 .close-btn {
   background: none;
@@ -337,9 +369,9 @@ onMounted(load)
   color: var(--color-text-muted);
   display: flex;
 }
-.close-btn  { 
-  width: 20px; 
-  height: 20px; 
+.close-btn {
+  width: 20px;
+  height: 20px;
 }
 
 .modal-body {
@@ -353,7 +385,9 @@ onMounted(load)
   align-items: center;
   gap: 1rem;
 }
-.avatar-preview-wrapper { position: relative; }
+.avatar-preview-wrapper {
+  position: relative;
+}
 .avatar-preview {
   width: 72px;
   height: 72px;
@@ -375,9 +409,9 @@ onMounted(load)
   justify-content: center;
   cursor: pointer;
 }
-.camera-btn { 
-  width: 13px; 
-  height: 13px; 
+.camera-btn {
+  width: 13px;
+  height: 13px;
 }
 .change-photo-btn {
   background: var(--color-background);
@@ -389,17 +423,18 @@ onMounted(load)
   cursor: pointer;
   color: var(--color-text);
 }
-.hidden-input { 
-  display: none; 
+.hidden-input {
+  display: none;
 }
-label { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 0.35rem; 
-  font-size: 0.85rem; 
-  color: var(--color-text-muted); 
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
 }
-input, textarea {
+input,
+textarea {
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -408,7 +443,8 @@ input, textarea {
   color: var(--color-text);
   background: var(--color-surface);
 }
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
   outline: none;
   border-color: var(--color-primary);
 }
@@ -417,7 +453,10 @@ input:focus, textarea:focus {
   justify-content: flex-end;
   gap: 0.5rem;
 }
-.char-count { font-size: 0.75rem; color: var(--color-text-muted); }
+.char-count {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -443,6 +482,12 @@ input:focus, textarea:focus {
   cursor: pointer;
   font-family: inherit;
 }
-.save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.error { color: var(--color-error); font-size: 0.8rem; }
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.error {
+  color: var(--color-error);
+  font-size: 0.8rem;
+}
 </style>

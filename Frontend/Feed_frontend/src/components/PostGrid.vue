@@ -1,10 +1,10 @@
 <script setup>
-import { STORAGE_URL } from '@/api/axios'
+import { STORAGE_URL } from '@/api/axios';
 
-defineProps({ posts: Array })
+defineProps({ posts: Array });
 
 function mediaUrl(path) {
-  return path ? `${STORAGE_URL}/${path}` : null
+  return path ? `${STORAGE_URL}/${path}` : null;
 }
 </script>
 

@@ -1,30 +1,30 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
-const router = useRouter()
-const auth = useAuthStore()
+const router = useRouter();
+const auth = useAuthStore();
 
-const form = ref({ email: '', password: '' })
-const errors = ref({})
-const loading = ref(false)
+const form = ref({ email: '', password: '' });
+const errors = ref({});
+const loading = ref(false);
 
 async function handleSubmit() {
-  errors.value = {}
-  loading.value = true
+  errors.value = {};
+  loading.value = true;
 
   try {
-    await auth.login(form.value)
-    router.push({ name: 'home' })
+    await auth.login(form.value);
+    router.push({ name: 'home' });
   } catch (err) {
     if (err.response?.status === 422) {
-      errors.value = err.response.data.errors || {}
+      errors.value = err.response.data.errors || {};
     } else {
-      errors.value = { general: ['Erro ao fazer login. Tenta de novo.'] }
+      errors.value = { general: ['Erro ao fazer login. Tenta de novo.'] };
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>

@@ -1,26 +1,26 @@
 <script setup>
-import { STORAGE_URL } from '@/api/axios'
-import { likePost, unlikePost } from '@/api/posts'
-import { timeAgo } from '@/lib/time'
-import Avatar from '@/components/Avatar.vue'
+import { STORAGE_URL } from '@/api/axios';
+import { likePost, unlikePost } from '@/api/posts';
+import { timeAgo } from '@/lib/time';
+import Avatar from '@/components/Avatar.vue';
 
-const props = defineProps({ post: Object })
+const props = defineProps({ post: Object });
 
 function mediaUrl(path) {
-  return path ? `${STORAGE_URL}/${path}` : null
+  return path ? `${STORAGE_URL}/${path}` : null;
 }
 
 async function toggleLike() {
-  const wasLiked = props.post.is_liked
-  props.post.is_liked = !wasLiked
-  props.post.likes_count += wasLiked ? -1 : 1
+  const wasLiked = props.post.is_liked;
+  props.post.is_liked = !wasLiked;
+  props.post.likes_count += wasLiked ? -1 : 1;
 
   try {
-    if (wasLiked) await unlikePost(props.post.id)
-    else await likePost(props.post.id)
+    if (wasLiked) await unlikePost(props.post.id);
+    else await likePost(props.post.id);
   } catch {
-    props.post.is_liked = wasLiked
-    props.post.likes_count += wasLiked ? 1 : -1
+    props.post.is_liked = wasLiked;
+    props.post.likes_count += wasLiked ? 1 : -1;
   }
 }
 </script>
@@ -30,12 +30,14 @@ async function toggleLike() {
     <header>
       <Avatar :name="post.user.name" :avatar-path="post.user.avatar_path" :size="44" />
       <div class="author-info">
-        <router-link :to="{ name: 'user-profile', params: { username: post.user.username } }" class="author-name">
+        <router-link
+          :to="{ name: 'user-profile', params: { username: post.user.username } }"
+          class="author-name"
+        >
           {{ post.user.name }}
         </router-link>
         <span>@{{ post.user.username }} · {{ timeAgo(post.created_at) }}</span>
       </div>
-      
     </header>
     <p v-if="post.caption" class="caption">
       {{ post.caption }}
@@ -54,10 +56,13 @@ async function toggleLike() {
         <i class="bi bi-chat"></i>
         {{ post.comments_count }}
       </router-link>
-
     </div>
 
-    <router-link v-if="post.comments_count > 0" :to="{ name: 'post', params: { id: post.id } }" class="view-comments">
+    <router-link
+      v-if="post.comments_count > 0"
+      :to="{ name: 'post', params: { id: post.id } }"
+      class="view-comments"
+    >
       Ver {{ post.comments_count }} comentário{{ post.comments_count > 1 ? 's' : '' }}
     </router-link>
   </article>

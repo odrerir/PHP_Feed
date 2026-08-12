@@ -1,49 +1,49 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { searchUsers } from '@/api/search'
-import { useAuthStore } from '@/stores/auth'
-import Avatar from '@/components/Avatar.vue'
+import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { searchUsers } from '@/api/search';
+import { useAuthStore } from '@/stores/auth';
+import Avatar from '@/components/Avatar.vue';
 
-const router = useRouter()
-const auth = useAuthStore()
+const router = useRouter();
+const auth = useAuthStore();
 
-const query = ref('')
-const results = ref([])
-const showDropdown = ref(false)
-const loading = ref(false)
-let debounceTimer = null
+const query = ref('');
+const results = ref([]);
+const showDropdown = ref(false);
+const loading = ref(false);
+let debounceTimer = null;
 
 async function runSearch() {
   if (!query.value.trim()) {
-    results.value = []
-    return
+    results.value = [];
+    return;
   }
-  loading.value = true
-  const { data } = await searchUsers(query.value)
-  results.value = data.data
-  loading.value = false
+  loading.value = true;
+  const { data } = await searchUsers(query.value);
+  results.value = data.data;
+  loading.value = false;
 }
 
 watch(query, () => {
-  clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(runSearch, 400)
-})
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(runSearch, 400);
+});
 
 function clearSearch() {
-  query.value = ''
-  results.value = []
+  query.value = '';
+  results.value = [];
 }
 
 function selectUser(username) {
-  clearSearch()
-  showDropdown.value = false
-  router.push({ name: 'user-profile', params: { username } })
+  clearSearch();
+  showDropdown.value = false;
+  router.push({ name: 'user-profile', params: { username } });
 }
 
 async function handleLogout() {
-  await auth.logout()
-  router.push({ name: 'login' })
+  await auth.logout();
+  router.push({ name: 'login' });
 }
 </script>
 
@@ -62,7 +62,7 @@ async function handleLogout() {
           @blur="showDropdown = false"
         />
         <button v-if="query" class="clear-btn" @mousedown.prevent="clearSearch">
-          <i class="bi bi-x-lg"></i> 
+          <i class="bi bi-x-lg"></i>
         </button>
       </div>
 
@@ -233,18 +233,27 @@ async function handleLogout() {
   border-radius: 8px;
   background-color: var(--color-border);
 }
-.clear-btn i, .logout-btn i { 
-  font-size: 1.3rem; 
+.clear-btn i,
+.logout-btn i {
+  font-size: 1.3rem;
 }
 @media (max-width: 640px) {
   .navbar {
     grid-template-columns: 1fr 1fr;
-    grid-template-areas: "logo right" "search search";
+    grid-template-areas: 'logo right' 'search search';
     padding: 0.85rem 1rem;
     row-gap: 0.6rem;
   }
-  .logo { grid-area: logo; }
-  .nav-right { grid-area: right; }
-  .search-wrapper { grid-area: search; width: 100%; max-width: 100%; }
+  .logo {
+    grid-area: logo;
+  }
+  .nav-right {
+    grid-area: right;
+  }
+  .search-wrapper {
+    grid-area: search;
+    width: 100%;
+    max-width: 100%;
+  }
 }
 </style>

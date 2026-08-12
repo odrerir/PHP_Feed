@@ -1,14 +1,14 @@
 <script setup>
-import { onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 
-const auth = useAuthStore()
+const auth = useAuthStore();
 
 onMounted(() => {
   if (auth.isAuthenticated && !auth.user) {
-    auth.fetchUser()
+    auth.fetchUser();
   }
-})
+});
 </script>
 
 <template>

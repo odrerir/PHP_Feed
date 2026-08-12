@@ -1,10 +1,10 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
-const router = useRouter()
-const auth = useAuthStore()
+const router = useRouter();
+const auth = useAuthStore();
 
 const form = ref({
   name: '',
@@ -12,25 +12,25 @@ const form = ref({
   email: '',
   password: '',
   password_confirmation: '',
-})
-const errors = ref({})
-const loading = ref(false)
+});
+const errors = ref({});
+const loading = ref(false);
 
 async function handleSubmit() {
-  errors.value = {}
-  loading.value = true
+  errors.value = {};
+  loading.value = true;
 
   try {
-    await auth.register(form.value)
-    router.push({ name: 'home' })
+    await auth.register(form.value);
+    router.push({ name: 'home' });
   } catch (err) {
     if (err.response?.status === 422) {
-      errors.value = err.response.data.errors || {}
+      errors.value = err.response.data.errors || {};
     } else {
-      errors.value = { general: ['Erro ao registrar. Tenta de novo.'] }
+      errors.value = { general: ['Erro ao registrar. Tenta de novo.'] };
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>
@@ -71,7 +71,12 @@ async function handleSubmit() {
 
         <label>
           Confirmar senha
-          <input v-model="form.password_confirmation" type="password" placeholder="••••••••" required />
+          <input
+            v-model="form.password_confirmation"
+            type="password"
+            placeholder="••••••••"
+            required
+          />
         </label>
 
         <button type="submit" :disabled="loading">

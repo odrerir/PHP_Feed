@@ -1,54 +1,57 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { fetchUserProfile, followUser, unfollowUser } from '@/api/profile'
-import { fetchUserPosts } from '@/api/posts'
-import Avatar from '@/components/Avatar.vue'
-import PostGrid from '@/components/PostGrid.vue'
-import Spinner from '@/components/Spinner.vue'
+import { ref, onMounted, watch } from 'vue';
+import { fetchUserProfile, followUser, unfollowUser } from '@/api/profile';
+import { fetchUserPosts } from '@/api/posts';
+import Avatar from '@/components/Avatar.vue';
+import PostGrid from '@/components/PostGrid.vue';
+import Spinner from '@/components/Spinner.vue';
 
-const props = defineProps(['username'])
+const props = defineProps(['username']);
 
-const profile = ref(null)
-const loading = ref(true)
+const profile = ref(null);
+const loading = ref(true);
 
-const posts = ref([])
-const postsPage = ref(1)
-const postsLastPage = ref(1)
+const posts = ref([]);
+const postsPage = ref(1);
+const postsLastPage = ref(1);
 
 async function loadPosts(page = 1) {
-  const { data } = await fetchUserPosts(props.username, page)
-  posts.value = page === 1 ? data.data : [...posts.value, ...data.data]
-  postsPage.value = data.current_page
-  postsLastPage.value = data.last_page
+  const { data } = await fetchUserPosts(props.username, page);
+  posts.value = page === 1 ? data.data : [...posts.value, ...data.data];
+  postsPage.value = data.current_page;
+  postsLastPage.value = data.last_page;
 }
 
 async function load() {
-  loading.value = true
-  const { data } = await fetchUserProfile(props.username)
-  profile.value = data
-  loading.value = false
-  await loadPosts(1)
+  loading.value = true;
+  const { data } = await fetchUserProfile(props.username);
+  profile.value = data;
+  loading.value = false;
+  await loadPosts(1);
 }
 
 async function toggleFollow() {
-  const wasFollowing = profile.value.is_following
-  profile.value.is_following = !wasFollowing
-  profile.value.followers_count += wasFollowing ? -1 : 1
+  const wasFollowing = profile.value.is_following;
+  profile.value.is_following = !wasFollowing;
+  profile.value.followers_count += wasFollowing ? -1 : 1;
 
   try {
-    if (wasFollowing) await unfollowUser(props.username)
-    else await followUser(props.username)
+    if (wasFollowing) await unfollowUser(props.username);
+    else await followUser(props.username);
   } catch {
-    profile.value.is_following = wasFollowing
-    profile.value.followers_count += wasFollowing ? 1 : -1
+    profile.value.is_following = wasFollowing;
+    profile.value.followers_count += wasFollowing ? 1 : -1;
   }
 }
 
-onMounted(load)
-watch(() => props.username, () => {
-  postsPage.value = 1
-  load()
-})
+onMounted(load);
+watch(
+  () => props.username,
+  () => {
+    postsPage.value = 1;
+    load();
+  }
+);
 </script>
 
 <template>
@@ -64,9 +67,18 @@ watch(() => props.username, () => {
         <p v-if="profile.user.bio" class="bio">{{ profile.user.bio }}</p>
 
         <div class="stats">
-          <div><strong>{{ profile.posts_count }}</strong><span>posts</span></div>
-          <div><strong>{{ profile.followers_count }}</strong><span>seguidores</span></div>
-          <div><strong>{{ profile.following_count }}</strong><span>seguindo</span></div>
+          <div>
+            <strong>{{ profile.posts_count }}</strong
+            ><span>posts</span>
+          </div>
+          <div>
+            <strong>{{ profile.followers_count }}</strong
+            ><span>seguidores</span>
+          </div>
+          <div>
+            <strong>{{ profile.following_count }}</strong
+            ><span>seguindo</span>
+          </div>
         </div>
       </div>
 
@@ -87,7 +99,11 @@ watch(() => props.username, () => {
     </div>
 
     <PostGrid :posts="posts" />
-    <button v-if="postsPage < postsLastPage" class="load-more-btn" @click="loadPosts(postsPage + 1)">
+    <button
+      v-if="postsPage < postsLastPage"
+      class="load-more-btn"
+      @click="loadPosts(postsPage + 1)"
+    >
       Carregar mais posts
     </button>
   </div>
@@ -110,13 +126,33 @@ watch(() => props.username, () => {
   box-shadow: var(--shadow-card);
   flex-wrap: wrap;
 }
-.profile-info { flex: 1; min-width: 200px; }
-.profile-info h1 { margin: 0; font-size: 1.3rem; }
-.username { color: var(--color-text-muted); margin: 0.15rem 0 0.6rem; }
-.bio { margin: 0 0 1rem; font-size: 0.9rem; }
-.stats { display: flex; gap: 2rem; }
-.stats div { display: flex; flex-direction: column; }
-.stats strong { font-size: 1.1rem; }
+.profile-info {
+  flex: 1;
+  min-width: 200px;
+}
+.profile-info h1 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+.username {
+  color: var(--color-text-muted);
+  margin: 0.15rem 0 0.6rem;
+}
+.bio {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+}
+.stats {
+  display: flex;
+  gap: 2rem;
+}
+.stats div {
+  display: flex;
+  flex-direction: column;
+}
+.stats strong {
+  font-size: 1.1rem;
+}
 .stats span {
   font-size: 0.78rem;
   color: var(--color-text-muted);
@@ -157,7 +193,7 @@ watch(() => props.username, () => {
   color: var(--color-text-muted);
 }
 
-.section-header  {
+.section-header {
   width: 18px;
   height: 18px;
 }

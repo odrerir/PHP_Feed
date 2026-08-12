@@ -1,5 +1,5 @@
 <script setup>
-defineProps({ size: { type: Number, default: 32 } })
+defineProps({ size: { type: Number, default: 32 } });
 </script>
 
 <template>
@@ -22,6 +22,8 @@ defineProps({ size: { type: Number, default: 32 } })
   animation: spin 0.7s linear infinite;
 }
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
