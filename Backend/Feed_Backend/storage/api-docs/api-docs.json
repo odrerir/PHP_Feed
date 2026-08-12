@@ -446,6 +446,25 @@
                 ]
             }
         },
+        "/api/posts/feed-with-suggestions": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Obter feed de posts com sugestões",
+                "operationId": "76b1f47ca24d7597f3a6f82ada671536",
+                "responses": {
+                    "200": {
+                        "description": "Feed de posts e sugestões"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/profile": {
             "get": {
                 "tags": [

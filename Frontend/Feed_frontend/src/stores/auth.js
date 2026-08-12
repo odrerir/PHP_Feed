@@ -28,8 +28,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchUser() {
-    if (user.value) return; // já tem em memória, não busca de novo
-    if (fetchUserPromise) return fetchUserPromise; // já tem uma busca em andamento, reaproveita
+    if (user.value) return; 
+    if (fetchUserPromise) return fetchUserPromise; 
 
     fetchUserPromise = api.get('/me').then(response => {
       user.value = response.data;
