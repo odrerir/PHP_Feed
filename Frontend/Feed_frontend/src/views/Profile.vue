@@ -7,6 +7,7 @@ import { STORAGE_URL } from '@/api/axios'
 import Avatar from '@/components/Avatar.vue'
 import PostGrid from '@/components/PostGrid.vue'
 import Spinner from '@/components/Spinner.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const BIO_MAX_LENGTH = 500
 
@@ -19,6 +20,7 @@ const form = ref({ name: '', username: '', bio: '' })
 const avatarFile = ref(null)
 const avatarPreview = ref(null)
 const fileInput = ref(null)
+const auth = useAuthStore()
 
 const posts = ref([])
 const postsPage = ref(1)
@@ -78,6 +80,7 @@ async function handleSave() {
   try {
     await updateProfile(formData)
     await load()
+    auth.setUser(profile.value.user)
     editing.value = false
   } catch (err) {
     if (err.response?.status === 422) errors.value = err.response.data.errors || {}

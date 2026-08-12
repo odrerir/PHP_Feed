@@ -74,27 +74,37 @@ onMounted(async () => {
     <div class="feed-column">
       <div class="composer-card">
         <template v-if="!showForm">
+
           <Avatar :name="auth.user?.name || ''" :avatar-path="auth.user?.avatar_path" :size="40" />
+
           <button class="composer-prompt" @click="showForm = true">
             Compartilhe com seus amigos {{ auth.user?.name?.split(' ')[0] || '' }}
           </button>
+
           <button class="new-post-btn" @click="showForm = true">
             <i class="bi bi-image"></i>
             Novo post
           </button>
+          
         </template>
 
         <form v-else @submit.prevent="handleCreatePost" class="new-post-form">
+
           <textarea v-model="caption" placeholder="Legenda (opcional)" rows="2" />
+
           <div class="file-picker">
+            <span v-if="mediaFile" class="file-name">{{ mediaFile.name }}</span>
+
             <label for="media-upload" class="file-upload-btn">
               <i class="bi bi-image"></i>
               {{ mediaFile ? 'Trocar imagem' : 'Escolher imagem' }}
             </label>
-            <span v-if="mediaFile" class="file-name">{{ mediaFile.name }}</span>
+
             <input id="media-upload" type="file" accept="image/*" class="hidden-input" @change="handleFileChange" />
           </div>
+
           <span v-if="errors.media" class="error">{{ errors.media[0] }}</span>
+
           <div class="form-actions">
             <button type="submit" :disabled="posting">{{ posting ? 'Publicando...' : 'Publicar' }}</button>
             <button type="button" class="cancel-btn" @click="showForm = false">Cancelar</button>
@@ -106,10 +116,13 @@ onMounted(async () => {
 
       <div v-else>
         <p v-if="posts.length === 0" class="empty-msg">Nenhum post ainda. Siga alguém ou crie o primeiro!</p>
+
         <PostCard v-for="post in posts" :key="post.id" :post="post" />
+
         <button v-if="page < lastPage" class="load-more-btn" @click="loadMore" :disabled="loadingMore">
           {{ loadingMore ? 'Carregando...' : 'Carregar mais' }}
         </button>
+
       </div>
     </div>
 
@@ -123,14 +136,19 @@ onMounted(async () => {
         >
           <Avatar :name="user.name" :avatar-path="user.avatar_path" :size="38" />
           <div class="suggestion-info">
+
             <router-link :to="{ name: 'user-profile', params: { username: user.username } }" class="name-link">
               <strong>{{ user.name }}</strong>
             </router-link>
+
             <span>@{{ user.username }}</span>
+
           </div>
+
           <router-link :to="{ name: 'user-profile', params: { username: user.username } }" class="ver-link">
             <span>ver</span>
           </router-link>
+
         </div>
       </div>
     </aside>
@@ -224,6 +242,7 @@ onMounted(async () => {
   cursor: pointer;
   font-family: inherit;
   text-align: center;
+  width: 11.7rem;
 }
 
 .file-input-hidden {
@@ -237,25 +256,13 @@ onMounted(async () => {
 .file-picker {
   display: flex;
   align-items: center;
+  justify-content: end;
   gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
-.file-picker i{
+.file-picker i {
   margin-right: 0.4rem;
-}
-
-.file-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 0.55rem 0.9rem;
-  font-family: inherit;
-  font-size: 0.85rem;
-  color: var(--color-text);
-  cursor: pointer;
 }
 
 .file-name {
@@ -264,11 +271,13 @@ onMounted(async () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-left: 0.4rem;
   max-width: 180px;
 }
 
 .form-actions {
   display: flex;
+  justify-content: end;
   gap: 0.6rem;
 }
 

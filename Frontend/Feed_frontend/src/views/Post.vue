@@ -18,6 +18,8 @@ const loading = ref(true)
 const newComment = ref('')
 const commenting = ref(false)
 const deleting = ref(false)
+const showDeleteModal = ref(false)
+
 const commentsPage = ref(1)
 const commentsLastPage = ref(1)
 
@@ -72,15 +74,15 @@ async function handleComment() {
   }
 }
 
-async function handleDelete() {
-  if (!confirm('Excluir este post?')) return
+async function confirmDelete() {
   deleting.value = true
 
   try {
     await deletePost(props.id)
-    router.push({ name: 'home' })
+    router.push({ name: 'profile' })
   } finally {
     deleting.value = false
+    showDeleteModal.value = false
   }
 }
 
@@ -105,7 +107,7 @@ watch(() => props.id, load)
           </router-link>
           <span>@{{ post.user.username }}</span>
         </div>
-        <button v-if="post.user.id === auth.user?.id" class="delete-btn" @click="handleDelete" :disabled="deleting">
+        <button v-if="post.user.id === auth.user?.id" class="delete-btn" @click="showDeleteModal = true">
           <i class="bi bi-trash"></i>
         </button>
       </header>
@@ -150,6 +152,21 @@ watch(() => props.id, load)
         </button>
       </form>
     </div>
+    <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
+      <div class="confirm-modal">
+        <div class="confirm-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h2>Excluir post?</h2>
+        <p>Essa ação não pode ser desfeita. O post será removido permanentemente.</p>
+        <div class="confirm-actions">
+          <button class="cancel-btn" @click="showDeleteModal = false">Cancelar</button>
+          <button class="confirm-delete-btn" :disabled="deleting" @click="confirmDelete">
+            {{ deleting ? 'Excluindo...' : 'Excluir' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -168,9 +185,13 @@ watch(() => props.id, load)
   background: var(--color-background);
   display: flex;
   align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 .media-side img {
-  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   display: block;
 }
 .panel {
@@ -311,9 +332,92 @@ watch(() => props.id, load)
   cursor: pointer;
   flex-shrink: 0;
 }
-.panel-input button:disabled { opacity: 0.6; cursor: not-allowed; }
-.panel-input button i { font-size: 0.95rem; }
-
+.panel-input button:disabled { 
+  opacity: 0.6; 
+  cursor: not-allowed; 
+}
+.panel-input button i { 
+  font-size: 0.95rem; 
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem;
+}
+.confirm-modal {
+  width: 360px;
+  max-width: 100%;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+.confirm-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--color-error) 12%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.confirm-icon i {
+  font-size: 1.6rem;
+  color: var(--color-error);
+}
+.confirm-modal h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+.confirm-modal p {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1.5rem;
+}
+.confirm-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+.confirm-actions button {
+  flex: 1;
+  padding: 0.65rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cancel-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+.confirm-delete-btn {
+  background: var(--color-error);
+  border: none;
+  color: white;
+}
+.confirm-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.load-more-comments {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  align-self: flex-start;
+  padding: 0;
+}
 @media (max-width: 720px) {
   .post-detail { grid-template-columns: 1fr; }
   .panel { border-left: none; border-top: 1px solid var(--color-border); }

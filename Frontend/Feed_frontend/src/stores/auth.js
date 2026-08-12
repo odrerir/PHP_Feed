@@ -40,6 +40,10 @@ export const useAuthStore = defineStore('auth', () => {
     return fetchUserPromise
   }
 
+  function setUser(updatedUser) {
+    user.value = updatedUser
+  }
+
   function setSession(data) {
     user.value = data.user
     token.value = data.token
@@ -52,5 +56,5 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('auth_token')
   }
 
-  return { user, token, isAuthenticated, register, login, logout, fetchUser }
+  return { user, token, isAuthenticated, register, login, logout, fetchUser, setUser }
 })

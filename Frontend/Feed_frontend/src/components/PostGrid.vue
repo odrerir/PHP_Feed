@@ -28,16 +28,23 @@ function mediaUrl(path) {
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
 }
+.grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform 0.2s ease;
+}
+.grid-item:hover img {
+  transform: scale(1.05);
+}
 .grid-item {
   aspect-ratio: 1 / 1;
   display: block;
   overflow: hidden;
   border-radius: 6px;
-}
-.grid-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: relative;
 }
 .grid-item-placeholder {
   background: var(--color-background);

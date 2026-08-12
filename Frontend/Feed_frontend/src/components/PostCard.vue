@@ -35,9 +35,14 @@ async function toggleLike() {
         </router-link>
         <span>@{{ post.user.username }} · {{ timeAgo(post.created_at) }}</span>
       </div>
+      
     </header>
-
-    <img v-if="mediaUrl(post.media_path)" :src="mediaUrl(post.media_path)" class="media" />
+    <p v-if="post.caption" class="caption">
+      {{ post.caption }}
+    </p>
+    <div class="media-wrapper">
+      <img v-if="mediaUrl(post.media_path)" :src="mediaUrl(post.media_path)" class="media" />
+    </div>
 
     <div class="actions">
       <button @click="toggleLike" :class="{ liked: post.is_liked }" class="icon-btn">
@@ -51,10 +56,6 @@ async function toggleLike() {
       </router-link>
 
     </div>
-
-    <p v-if="post.caption" class="caption">
-      <strong>{{ post.user.username }}</strong> {{ post.caption }}
-    </p>
 
     <router-link v-if="post.comments_count > 0" :to="{ name: 'post', params: { id: post.id } }" class="view-comments">
       Ver {{ post.comments_count }} comentário{{ post.comments_count > 1 ? 's' : '' }}
@@ -76,6 +77,7 @@ header {
   align-items: center;
   gap: 0.7rem;
   padding: 0.9rem 1rem;
+  padding-bottom: 0.5rem;
 }
 .author-info {
   display: flex;
@@ -96,11 +98,20 @@ header {
   font-size: 0.78rem;
   color: var(--color-text-muted);
 }
+.media-wrapper {
+  width: 100%;
+  max-height: 600px;
+  background: var(--color-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 .media {
   width: 100%;
+  max-height: 600px;
+  object-fit: contain;
   display: block;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
 }
 .actions {
   display: flex;
@@ -138,9 +149,7 @@ header {
 .caption {
   padding: 0.2rem 1rem 0.4rem;
   font-size: 0.9rem;
-}
-.caption strong {
-  margin-right: 0.3rem;
+  margin: 0;
 }
 .view-comments {
   display: block;
