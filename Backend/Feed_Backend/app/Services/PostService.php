@@ -27,6 +27,14 @@ class PostService
         ]);
     }
 
+    public function delete(Post $post, User $user): void
+    {
+        if ($post->user_id !== $user->id) {
+            throw new AuthorizationException('Você só pode excluir os próprios posts.');
+        }
+        $post->delete();
+    }
+    
     public function showWithDetails(Post $post, User $viewer): array
     {
         $post->loadCount(['comments', 'likes'])
@@ -34,14 +42,6 @@ class PostService
             ->load('user');
 
         return $this->formatPost($post, $viewer);
-    }
-
-    public function delete(Post $post, User $user): void
-    {
-        if ($post->user_id !== $user->id) {
-            throw new AuthorizationException('Você só pode excluir os próprios posts.');
-        }
-        $post->delete();
     }
 
     private function formatPost(Post $post, User $viewer): array
